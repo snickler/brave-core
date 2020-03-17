@@ -2,26 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function() {
-  'use strict';
-/**
- * Names of the individual data type properties to be cached from
- * settings.SyncPrefs when the user checks 'Sync All'.
- * @type {!Array<string>}
- */
-const SyncPrefsIndividualDataTypes = [
-  'appsSynced',
-  'extensionsSynced',
-  'preferencesSynced',
-  'autofillSynced',
-  'typedUrlsSynced',
-  'themesSynced',
-  'bookmarksSynced',
-  'passwordsSynced',
-  'tabsSynced',
-  'paymentsIntegrationEnabled',
-];
-
 /**
  * 'settings-brave-sync-page' is the settings page containing brave's
  * custom sync.
@@ -29,169 +9,55 @@ const SyncPrefsIndividualDataTypes = [
 Polymer({
   is: 'settings-brave-sync-page',
 
-  behaviors: [WebUIListenerBehavior],
+  behaviors: [I18nBehavior, WebUIListenerBehavior],
 
   properties: {
-    hidden: {
-      type: Boolean,
-      value: false,
-      computed: 'syncControlsHidden_(' +
-          'syncStatus.signedIn, syncStatus.disabled, syncStatus.hasError)',
-      reflectToAttribute: true,
-    },
-
     /**
-     * The current sync preferences, supplied by SyncBrowserProxy.
-     * @type {settings.SyncPrefs|undefined}
+     * Preferences state.
      */
-    syncPrefs: Object,
-
-    /**
-     * The current sync status, supplied by the parent.
-     * @type {settings.SyncStatus}
-     */
-    syncStatus: {
+    prefs: {
       type: Object,
-      observer: 'syncStatusChanged_',
+      notify: true,
     },
+
+    /**
+     * The current sync status, supplied by SyncBrowserProxy.
+     * @type {?settings.SyncStatus}
+     */
+    syncStatus: Object,
+
+    /**
+     * Dictionary defining page visibility.
+     * @type {!PageVisibility}
+     */
+    pageVisibility: Object,
   },
 
   /** @private {?settings.SyncBrowserProxy} */
-  browserProxy_: null,
-
-  /**
-   * Caches the individually selected synced data types. This is used to
-   * be able to restore the selections after checking and unchecking Sync All.
-   * @private {?Object}
-   */
-  cachedSyncPrefs_: null,
-
-  /** @override */
-  created: function() {
-    this.browserProxy_ = settings.DefaultBraveSyncBrowserProxyImpl.getInstance();
-  },
+  syncBrowserProxy_: null,
 
   /** @override */
   attached: function() {
-    this.addWebUIListener(
-        'sync-prefs-changed', this.handleSyncPrefsChanged_.bind(this));
-    this.browserProxy_.didNavigateToSyncPage();
+    this.syncBrowserProxy_ = settings.SyncBrowserProxyImpl.getInstance();
+    this.syncBrowserProxy_.getSyncStatus().then(
+        this.handleSyncStatus_.bind(this));
+    this.addWebUIListener('sync-settings-saved', () => {
+    });
   },
 
   /**
-   * Handler for when the sync preferences are updated.
+   * Handler for when the sync state is pushed from the browser.
+   * @param {?settings.SyncStatus} syncStatus
    * @private
    */
-  handleSyncPrefsChanged_: function(syncPrefs) {
-    this.syncPrefs = syncPrefs;
-
-    // If autofill is not registered or synced, force Payments integration off.
-    if (!this.syncPrefs.autofillRegistered || !this.syncPrefs.autofillSynced) {
-      this.set('syncPrefs.paymentsIntegrationEnabled', false);
-    }
-  },
-
-  /**
-   * Handler for when the sync all data types checkbox is changed.
-   * @param {!Event} event
-   * @private
-   */
-  onSyncAllDataTypesChanged_: function(event) {
-    if (event.target.checked) {
-      this.set('syncPrefs.syncAllDataTypes', true);
-
-      // Cache the previously selected preference before checking every box.
-      this.cachedSyncPrefs_ = {};
-      for (const dataType of SyncPrefsIndividualDataTypes) {
-        // These are all booleans, so this shallow copy is sufficient.
-        this.cachedSyncPrefs_[dataType] = this.syncPrefs[dataType];
-
-        this.set(['syncPrefs', dataType], true);
-      }
-    } else if (this.cachedSyncPrefs_) {
-      // Restore the previously selected preference.
-      for (const dataType of SyncPrefsIndividualDataTypes) {
-        this.set(['syncPrefs', dataType], this.cachedSyncPrefs_[dataType]);
-      }
-    }
-
-    this.onSingleSyncDataTypeChanged_();
-  },
-
-  /**
-   * Handler for when any sync data type checkbox is changed (except autofill).
-   * @private
-   */
-  onSingleSyncDataTypeChanged_: function() {
-    this.browserProxy_.setSyncDatatypes(this.syncPrefs);
-  },
-
-  /**
-   * Handler for when the autofill data type checkbox is changed.
-   * @private
-   */
-  onAutofillDataTypeChanged_: function() {
-    this.set(
-        'syncPrefs.paymentsIntegrationEnabled', this.syncPrefs.autofillSynced);
-
-    this.onSingleSyncDataTypeChanged_();
-  },
-
-  /**
-   * Handler for when the autofill data type checkbox is changed.
-   * @private
-   */
-  onTypedUrlsDataTypeChanged_: function() {
-    this.onSingleSyncDataTypeChanged_();
-  },
-
-  /**
-   * @param {boolean} syncAllDataTypes
-   * @param {boolean} enforced
-   * @return {boolean} Whether the sync checkbox should be disabled.
-   */
-  shouldSyncCheckboxBeDisabled_: function(syncAllDataTypes, enforced) {
-    return syncAllDataTypes || enforced;
-  },
-
-  /**
-   * @param {boolean} syncAllDataTypes
-   * @param {boolean} autofillSynced
-   * @return {boolean} Whether the sync checkbox should be disabled.
-   */
-  shouldPaymentsCheckboxBeDisabled_: function(
-      syncAllDataTypes, autofillSynced) {
-    return syncAllDataTypes || !autofillSynced;
+  handleSyncStatus_: function(syncStatus) {
+    this.syncStatus = syncStatus;
   },
 
   /** @private */
-  syncStatusChanged_: function() {
-    if (settings.getCurrentRoute() == settings.routes.SYNC_ADVANCED &&
-        this.syncControlsHidden_()) {
-      settings.navigateTo(settings.routes.SYNC);
-    }
+  onSyncTap_: function() {
+    // Users can go to sync subpage regardless of sync status.
+    settings.navigateTo(settings.routes.BRAVE_SYNC_SETUP);
   },
 
-  /**
-   * @return {boolean} Whether the sync controls are hidden.
-   * @private
-   */
-  syncControlsHidden_: function() {
-    return false;
-    if (!this.syncStatus) {
-      // Show sync controls by default.
-      return false;
-    }
-
-    if (!this.syncStatus.signedIn || this.syncStatus.disabled) {
-      return true;
-    }
-
-    return !!this.syncStatus.hasError &&
-        this.syncStatus.statusAction !==
-        settings.StatusAction.ENTER_PASSPHRASE &&
-        this.syncStatus.statusAction !==
-        settings.StatusAction.RETRIEVE_TRUSTED_VAULT_KEYS;
-  },
 });
-})();
