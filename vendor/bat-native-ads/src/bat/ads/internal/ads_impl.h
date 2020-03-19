@@ -24,13 +24,10 @@
 #include "bat/ads/internal/ad_conversions.h"
 #include "bat/ads/internal/ad_notification_result_type.h"
 #include "bat/ads/internal/ad_notifications.h"
-#include "bat/usermodel/user_model.h"
+#include "bat/ads/internal/page_classifier/page_classifier.h"
 #include "bat/ads/internal/purchase_intent/purchase_intent_classifier.h"
 
 namespace ads {
-
-using WinningCategoryList = std::vector<std::string>;
-using CategoryList = std::vector<std::string>;
 
 class Client;
 class Bundle;
@@ -53,6 +50,7 @@ class AdsImpl : public Ads {
   Client* get_client() const;
 
   AdNotifications* get_ad_notifications() const;
+  PageClassifier* get_page_classifier() const;
 
   InitializeCallback initialize_callback_;
   void Initialize(
@@ -74,9 +72,6 @@ class AdsImpl : public Ads {
   void OnUserModelLoaded(
       const Result result,
       const std::string& json);
-  void InitializeUserModel(
-      const std::string& json,
-      const std::string& language);
 
   bool IsMobile() const;
   bool IsAndroid() const;
@@ -162,25 +157,11 @@ class AdsImpl : public Ads {
       const std::string& url);
   void GeneratePurchaseIntentSignalHistoryEntry(
       const PurchaseIntentSignalInfo& purchase_intent_signal);
+  PurchaseIntentWinningCategoryList GetWinningPurchaseIntentCategories();
 
   void MaybeClassifyPage(
       const std::string& url,
       const std::string& content);
-  bool ShouldClassifyPagesIfTargeted() const;
-  std::string ClassifyPage(
-      const std::string& url,
-      const std::string& content);
-
-  WinningCategoryList GetWinningCategories();
-  PurchaseIntentWinningCategoryList GetWinningPurchaseIntentCategories();
-  std::string GetWinningCategory(
-      const std::vector<double>& page_score);
-
-  std::map<std::string, std::vector<double>> page_score_cache_;
-  void CachePageScore(
-      const std::string& url,
-      const std::vector<double>& page_score);
-  const std::map<std::string, std::vector<double>>& GetPageScoreCache() const;
 
   void TestShoppingData(
       const std::string& url);
@@ -297,7 +278,7 @@ class AdsImpl : public Ads {
   std::unique_ptr<AdsServe> ads_serve_;
   std::unique_ptr<FrequencyCapping> frequency_capping_;
   std::unique_ptr<AdConversions> ad_conversions_;
-  std::unique_ptr<usermodel::UserModel> user_model_;
+  std::unique_ptr<PageClassifier> page_classifier_;
   std::unique_ptr<PurchaseIntentClassifier> purchase_intent_classifier_;
 
  private:

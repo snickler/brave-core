@@ -14,6 +14,7 @@
 
 #include "bat/ads/ad_history.h"
 #include "bat/ads/purchase_intent_signal_history.h"
+#include "bat/ads/internal/page_classifier/page_classifier.h"
 #include "bat/ads/result.h"
 
 #include "bat/ads/internal/ad_preferences.h"
@@ -46,7 +47,7 @@ struct ClientState {
   std::string user_model_language = kDefaultUserModelLanguage;
   std::vector<std::string> user_model_languages;
   std::string last_page_classification;
-  std::deque<std::vector<double>> page_score_history;
+  PageProbabilitiesList page_probabilities_history;
   std::map<std::string, std::deque<uint64_t>> creative_set_history;
   std::map<std::string, std::deque<uint64_t>> ad_conversion_history;
   std::map<std::string, std::deque<uint64_t>> campaign_history;

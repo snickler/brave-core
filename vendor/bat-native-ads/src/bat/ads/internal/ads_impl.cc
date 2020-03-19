@@ -90,7 +90,7 @@ AdsImpl::AdsImpl(AdsClient* ads_client)
       frequency_capping_(std::make_unique<FrequencyCapping>(client_.get())),
       ad_conversions_(std::make_unique<AdConversions>(
           this, ads_client, client_.get())),
-      user_model_(nullptr),
+      page_classifier_(std::make_unique<PageClassifier>(this)),
       purchase_intent_classifier_(std::make_unique<PurchaseIntentClassifier>(
           kPurchaseIntentSignalLevel, kPurchaseIntentClassificationThreshold,
               kPurchaseIntentSignalDecayTimeWindow)),
@@ -117,6 +117,10 @@ Client* AdsImpl::get_client() const {
 
 AdNotifications* AdsImpl::get_ad_notifications() const {
   return ad_notifications_.get();
+}
+
+PageClassifier* AdsImpl::get_page_classifier() const {
+  return page_classifier_.get();
 }
 
 void AdsImpl::Initialize(
@@ -252,7 +256,8 @@ bool AdsImpl::IsInitialized() {
     return false;
   }
 
-  if (ShouldClassifyPagesIfTargeted() && !user_model_->IsInitialized()) {
+  if (page_classifier_->ShouldClassifyPages() &&
+      !page_classifier_->IsInitialized()) {
     return false;
   }
 
@@ -293,24 +298,18 @@ void AdsImpl::OnUserModelLoaded(
   BLOG(INFO) << "Successfully loaded user model for " << language
       << " language";
 
-  InitializeUserModel(json, language);
+  if (!page_classifier_->Initialize(json)) {
+    BLOG(ERROR) << "Failed to initialize page classification user model for "
+        << language << " language";
+    return;
+  }
+
+  BLOG(INFO) << "Successfully initialized page classification user model for "
+      << language << " language";
 
   if (!IsInitialized()) {
     InitializeStep5(SUCCESS);
   }
-}
-
-void AdsImpl::InitializeUserModel(
-    const std::string& json,
-    const std::string& language) {
-  // TODO(Terry Mancey): Refactor function to use callbacks
-
-  BLOG(INFO) << "Initializing user model for \"" << language << "\" language";
-
-  user_model_.reset(usermodel::UserModel::CreateInstance());
-  user_model_->InitializePageClassifier(json);
-
-  BLOG(INFO) << "Initialized user model for \"" << language << "\" language";
 }
 
 bool AdsImpl::IsMobile() const {
@@ -623,7 +622,7 @@ void AdsImpl::ChangeLocale(
     const std::string& locale) {
   auto language = helper::Locale::GetLanguageCode(locale);
 
-  if (!ShouldClassifyPagesIfTargeted()) {
+  if (!page_classifier_->ShouldClassifyPages()) {
     client_->SetUserModelLanguage(language);
 
     InitializeStep5(SUCCESS);
@@ -717,7 +716,7 @@ void AdsImpl::OnPageLoaded(
 
 void AdsImpl::ExtractPurchaseIntentSignal(
     const std::string& url) {
-  if (!ShouldClassifyPagesIfTargeted()) {
+  if (!page_classifier_->ShouldClassifyPages()) {
     return;
   }
 
@@ -751,156 +750,36 @@ void AdsImpl::GeneratePurchaseIntentSignalHistoryEntry(
 void AdsImpl::MaybeClassifyPage(
     const std::string& url,
     const std::string& content) {
+  std::string page_classification;
+
+  if (page_classifier_->ShouldClassifyPages()) {
+    const std::string page_classification =
+        page_classifier_->ClassifyPage(url, content);
+
+    if (page_classification.empty()) {
+      BLOG(WARNING) << "Failed to classify page at " << url;
+    } else {
+      const CategoryList winning_categories =
+          page_classifier_->GetWinningCategories();
+
+      BLOG(INFO) << "Successfully classified page at " << url << " as "
+          << page_classification << ". Winning page classification over time"
+              "is " << winning_categories.front();
+    }
+  } else {
+    page_classification = kUntargetedPageClassification;
+  }
+
+  client_->SetLastPageClassification(page_classification);
+
   LoadInfo load_info;
   load_info.tab_id = active_tab_id_;
   load_info.tab_url = active_tab_url_;
-
-  if (ShouldClassifyPagesIfTargeted()) {
-    load_info.tab_classification = ClassifyPage(url, content);
-  } else {
-    load_info.tab_classification = kUntargetedPageClassification;
-  }
+  load_info.tab_classification = page_classification;
 
   const Reports reports(this);
   const std::string report = reports.GenerateLoadEventReport(load_info);
   ads_client_->EventLog(report);
-}
-
-bool AdsImpl::ShouldClassifyPagesIfTargeted() const {
-  const std::string locale = ads_client_->GetLocale();
-  const std::string region = helper::Locale::GetRegionCode(locale);
-
-  auto targeted = false;
-
-  for (const auto& schema : kSupportedRegionsSchemas) {
-    const std::map<std::string, bool> regions = schema.second;
-    const auto it = regions.find(region);
-    if (it != regions.end()) {
-      targeted = it->second;
-      break;
-    }
-  }
-
-  return targeted;
-}
-
-std::string AdsImpl::ClassifyPage(
-    const std::string& url,
-    const std::string& content) {
-  DCHECK(user_model_);
-  auto page_score = user_model_->ClassifyPage(content);
-
-  auto winning_category = GetWinningCategory(page_score);
-  if (winning_category.empty()) {
-    BLOG(INFO) << "Failed to classify page at " << url
-        << " as not enough content";
-    return "";
-  }
-
-  client_->SetLastPageClassification(winning_category);
-
-  client_->AppendPageScoreToPageScoreHistory(page_score);
-
-  CachePageScore(active_tab_url_, page_score);
-
-  const auto winning_categories = GetWinningCategories();
-
-  BLOG(INFO) << "Successfully classified page at " << url << " as "
-      << winning_category << ". Winning category over time is "
-      << winning_categories.front();
-
-  return winning_category;
-}
-
-WinningCategoryList AdsImpl::GetWinningCategories() {
-  WinningCategoryList winning_categories;
-
-  if (!ShouldClassifyPagesIfTargeted()) {
-    return winning_categories;
-  }
-
-  auto page_score_history = client_->GetPageScoreHistory();
-  if (page_score_history.empty()) {
-    return winning_categories;
-  }
-
-  uint64_t count = page_score_history.front().size();
-
-  std::vector<double> winning_category_page_scores(count);
-  std::fill(winning_category_page_scores.begin(),
-      winning_category_page_scores.end(), 0.0);
-
-  for (const auto& page_score : page_score_history) {
-    DCHECK(page_score.size() == count);
-    DCHECK(user_model_);
-
-    for (size_t i = 0; i < page_score.size(); i++) {
-      auto taxonomy = user_model_->GetTaxonomyAtIndex(i);
-      if (client_->IsFilteredCategory(taxonomy)) {
-        BLOG(INFO) << taxonomy
-                   << " taxonomy has been excluded from the winner over time";
-
-        continue;
-      }
-
-      winning_category_page_scores[i] += page_score[i];
-    }
-  }
-
-  auto sorted_winning_category_page_scores = winning_category_page_scores;
-  std::sort(sorted_winning_category_page_scores.begin(),
-      sorted_winning_category_page_scores.end(), std::greater<double>());
-
-  for (const auto& page_score : sorted_winning_category_page_scores) {
-    if (page_score == 0.0) {
-      continue;
-    }
-
-    auto it = std::find(winning_category_page_scores.begin(),
-        winning_category_page_scores.end(), page_score);
-    const int index = std::distance(winning_category_page_scores.begin(), it);
-    DCHECK(user_model_);
-    const std::string category = user_model_->GetTaxonomyAtIndex(index);
-    if (category.empty()) {
-      continue;
-    }
-
-    if (std::find(winning_categories.begin(), winning_categories.end(),
-        category) != winning_categories.end()) {
-      continue;
-    }
-
-    winning_categories.push_back(category);
-
-    if (winning_categories.size() == kWinningCategoryCountForServingAds) {
-      break;
-    }
-  }
-
-  return winning_categories;
-}
-
-std::string AdsImpl::GetWinningCategory(
-    const std::vector<double>& page_score) {
-  DCHECK(user_model_);
-  return user_model_->GetWinningCategory(page_score);
-}
-
-void AdsImpl::CachePageScore(
-    const std::string& url,
-    const std::vector<double>& page_score) {
-  auto cached_page_score = page_score_cache_.find(url);
-
-  if (cached_page_score == page_score_cache_.end()) {
-    page_score_cache_.insert({url, page_score});
-  } else {
-    cached_page_score->second = page_score;
-  }
-}
-
-const std::map<std::string, std::vector<double>>&
-AdsImpl::GetPageScoreCache() const {
-  return page_score_cache_;
 }
 
 PurchaseIntentWinningCategoryList
@@ -1084,7 +963,7 @@ void AdsImpl::ServeAdNotificationIfReady(
 
 CategoryList AdsImpl::GetCategoriesToServeAd() {
   CategoryList categories;
-  WinningCategoryList contextual_categories = GetWinningCategories();
+  CategoryList contextual_categories = page_classifier_->GetWinningCategories();
   categories.insert(categories.end(),
       contextual_categories.begin(), contextual_categories.end());
   PurchaseIntentWinningCategoryList purchase_intent_categories =
