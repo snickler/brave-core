@@ -189,7 +189,7 @@ void PromotionTransfer::DeleteTokens(
     return;
   }
 
-  ledger_->DeleteUnblindedTokens(sent_ids, callback);
+  ledger_->ClaimUnblindedTokens(sent_ids, callback);
 }
 
 }  // namespace braveledger_promotion

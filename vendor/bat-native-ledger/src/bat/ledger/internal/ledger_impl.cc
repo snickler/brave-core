@@ -1572,15 +1572,15 @@ void LedgerImpl::SaveUnblindedTokenList(
   bat_database_->SaveUnblindedTokenList(std::move(list), callback);
 }
 
-void LedgerImpl::GetAllUnblindedTokens(
+void LedgerImpl::GetSpendableUnblindedTokens(
     ledger::GetUnblindedTokenListCallback callback) {
-  bat_database_->GetAllUnblindedTokens(callback);
+  bat_database_->GetSpendableUnblindedTokens(callback);
 }
 
-void LedgerImpl::DeleteUnblindedTokens(
+void LedgerImpl::ClaimUnblindedTokens(
     const std::vector<std::string>& id_list,
     ledger::ResultCallback callback) {
-  bat_database_->DeleteUnblindedTokens(id_list, callback);
+  bat_database_->ClaimUnblindedTokens(id_list, callback);
 }
 
 void LedgerImpl::GetUnblindedTokensByTriggerIds(

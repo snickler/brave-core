@@ -576,10 +576,10 @@ class MockLedgerImpl : public LedgerImpl {
   MOCK_METHOD2(SaveUnblindedTokenList, void(
     ledger::UnblindedTokenList, ledger::ResultCallback));
 
-  MOCK_METHOD1(GetAllUnblindedTokens,
+  MOCK_METHOD1(GetSpendableUnblindedTokens,
       void(ledger::GetUnblindedTokenListCallback));
 
-  MOCK_METHOD2(DeleteUnblindedTokens,
+  MOCK_METHOD2(ClaimUnblindedTokens,
       void(const std::vector<std::string>&, ledger::ResultCallback));
 
   MOCK_METHOD0(GetClientInfo, ledger::ClientInfoPtr());

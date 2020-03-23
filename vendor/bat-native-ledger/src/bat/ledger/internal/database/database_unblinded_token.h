@@ -24,13 +24,13 @@ class DatabaseUnblindedToken: public DatabaseTable {
       ledger::UnblindedTokenList list,
       ledger::ResultCallback callback);
 
-  void GetAllRecords(ledger::GetUnblindedTokenListCallback callback);
+  void GetSpendableRecords(ledger::GetUnblindedTokenListCallback callback);
 
   void GetRecordsByTriggerIds(
       const std::vector<std::string>& trigger_ids,
       ledger::GetUnblindedTokenListCallback callback);
 
-  void DeleteRecordList(
+  void ClaimRecordList(
       const std::vector<std::string>& ids,
       ledger::ResultCallback callback);
 
@@ -43,11 +43,15 @@ class DatabaseUnblindedToken: public DatabaseTable {
 
   bool CreateTableV18(ledger::DBTransaction* transaction);
 
+  bool CreateTableV20(ledger::DBTransaction* transaction);
+
   bool CreateIndexV10(ledger::DBTransaction* transaction);
 
   bool CreateIndexV15(ledger::DBTransaction* transaction);
 
   bool CreateIndexV18(ledger::DBTransaction* transaction);
+
+  bool CreateIndexV20(ledger::DBTransaction* transaction);
 
   bool MigrateToV10(ledger::DBTransaction* transaction);
 
@@ -56,6 +60,8 @@ class DatabaseUnblindedToken: public DatabaseTable {
   bool MigrateToV15(ledger::DBTransaction* transaction);
 
   bool MigrateToV18(ledger::DBTransaction* transaction);
+
+  bool MigrateToV20(ledger::DBTransaction* transaction);
 
   void OnGetRecords(
       ledger::DBCommandResponsePtr response,

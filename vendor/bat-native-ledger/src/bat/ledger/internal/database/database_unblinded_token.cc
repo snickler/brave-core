@@ -106,6 +106,31 @@ bool DatabaseUnblindedToken::CreateTableV18(
   return true;
 }
 
+bool DatabaseUnblindedToken::CreateTableV20(
+    ledger::DBTransaction* transaction) {
+  DCHECK(transaction);
+
+  const std::string query = base::StringPrintf(
+    "CREATE TABLE %s ("
+      "token_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+      "token_value TEXT,"
+      "public_key TEXT,"
+      "value DOUBLE NOT NULL DEFAULT 0,"
+      "creds_id TEXT,"
+      "expires_at TIMESTAMP NOT NULL DEFAULT 0,"
+      "claimed_at TIMESTAMP NOT NULL DEFAULT 0,"
+      "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"
+    ")",
+    table_name_);
+
+  auto command = ledger::DBCommand::New();
+  command->type = ledger::DBCommand::Type::EXECUTE;
+  command->command = query;
+  transaction->commands.push_back(std::move(command));
+
+  return true;
+}
+
 bool DatabaseUnblindedToken::CreateIndexV10(
     ledger::DBTransaction* transaction) {
   DCHECK(transaction);
@@ -121,6 +146,13 @@ bool DatabaseUnblindedToken::CreateIndexV15(
 }
 
 bool DatabaseUnblindedToken::CreateIndexV18(
+    ledger::DBTransaction* transaction) {
+  DCHECK(transaction);
+
+  return this->InsertIndex(transaction, table_name_, "creds_id");
+}
+
+bool DatabaseUnblindedToken::CreateIndexV20(
     ledger::DBTransaction* transaction) {
   DCHECK(transaction);
 
@@ -144,6 +176,9 @@ bool DatabaseUnblindedToken::Migrate(
     }
     case 18: {
       return MigrateToV18(transaction);
+    }
+    case 20: {
+      return MigrateToV20(transaction);
     }
     default: {
       return true;
@@ -314,6 +349,53 @@ bool DatabaseUnblindedToken::MigrateToV18(ledger::DBTransaction* transaction) {
   return true;
 }
 
+bool DatabaseUnblindedToken::MigrateToV20(ledger::DBTransaction* transaction) {
+  DCHECK(transaction);
+
+  const std::string temp_table_name = base::StringPrintf(
+      "%s_temp",
+      table_name_);
+
+  if (!RenameDBTable(transaction, table_name_, temp_table_name)) {
+    return false;
+  }
+
+  const std::string query =
+      "DROP INDEX IF EXISTS unblinded_tokens_creds_id_index;";
+  auto command = ledger::DBCommand::New();
+  command->type = ledger::DBCommand::Type::EXECUTE;
+  command->command = query;
+  transaction->commands.push_back(std::move(command));
+
+  if (!CreateTableV20(transaction)) {
+    return false;
+  }
+
+  if (!CreateIndexV20(transaction)) {
+    return false;
+  }
+
+  const std::map<std::string, std::string> columns = {
+    { "token_id", "token_id" },
+    { "token_value", "token_value" },
+    { "public_key", "public_key" },
+    { "value", "value" },
+    { "creds_id", "creds_id" },
+    { "expires_at", "expires_at" },
+    { "created_at", "created_at" }
+  };
+
+  if (!MigrateDBTable(
+      transaction,
+      temp_table_name,
+      table_name_,
+      columns,
+      true)) {
+    return false;
+  }
+  return true;
+}
+
 void DatabaseUnblindedToken::InsertOrUpdateList(
     ledger::UnblindedTokenList list,
     ledger::ResultCallback callback) {
@@ -357,13 +439,13 @@ void DatabaseUnblindedToken::InsertOrUpdateList(
   ledger_->RunDBTransaction(std::move(transaction), transaction_callback);
 }
 
-void DatabaseUnblindedToken::GetAllRecords(
+void DatabaseUnblindedToken::GetSpendableRecords(
     ledger::GetUnblindedTokenListCallback callback) {
   auto transaction = ledger::DBTransaction::New();
 
   const std::string query = base::StringPrintf(
       "SELECT token_id, token_value, public_key, value, creds_id, "
-      "expires_at FROM %s",
+      "expires_at FROM %s WHERE claimed_at = 0",
       table_name_);
 
   auto command = ledger::DBCommand::New();
@@ -448,7 +530,7 @@ void DatabaseUnblindedToken::GetRecordsByTriggerIds(
   ledger_->RunDBTransaction(std::move(transaction), transaction_callback);
 }
 
-void DatabaseUnblindedToken::DeleteRecordList(
+void DatabaseUnblindedToken::ClaimRecordList(
     const std::vector<std::string>& ids,
     ledger::ResultCallback callback) {
   if (ids.empty()) {
@@ -459,13 +541,15 @@ void DatabaseUnblindedToken::DeleteRecordList(
   auto transaction = ledger::DBTransaction::New();
 
   const std::string query = base::StringPrintf(
-      "DELETE FROM %s WHERE token_id IN (%s)",
+      "UPDATE %s SET claimed_at = ? WHERE token_id IN (%s)",
       table_name_,
       GenerateStringInCase(ids).c_str());
 
   auto command = ledger::DBCommand::New();
-  command->type = ledger::DBCommand::Type::EXECUTE;
+  command->type = ledger::DBCommand::Type::RUN;
   command->command = query;
+
+  BindInt64(command.get(), 0, braveledger_time_util::GetCurrentTimeStamp());
 
   transaction->commands.push_back(std::move(command));
 

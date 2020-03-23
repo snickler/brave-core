@@ -275,10 +275,10 @@ class Database {
       ledger::UnblindedTokenList list,
       ledger::ResultCallback callback);
 
-  void GetAllUnblindedTokens(
+  void GetSpendableUnblindedTokens(
       ledger::GetUnblindedTokenListCallback callback);
 
-  void DeleteUnblindedTokens(
+  void ClaimUnblindedTokens(
       const std::vector<std::string>& ids,
       ledger::ResultCallback callback);
 

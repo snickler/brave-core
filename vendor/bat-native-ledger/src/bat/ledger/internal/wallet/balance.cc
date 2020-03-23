@@ -115,7 +115,7 @@ void Balance::GetUnBlindedTokens(
       *balance,
       callback,
       _1);
-  ledger_->GetAllUnblindedTokens(tokens_callback);
+  ledger_->GetSpendableUnblindedTokens(tokens_callback);
 }
 
 void Balance::OnGetUnBlindedTokens(

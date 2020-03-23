@@ -626,7 +626,7 @@ class LedgerImpl : public ledger::Ledger {
   virtual void GetAllUnblindedTokens(
       ledger::GetUnblindedTokenListCallback callback);
 
-  virtual void DeleteUnblindedTokens(
+  virtual void GetSpendableUnblindedTokens(
       const std::vector<std::string>& id_list,
       ledger::ResultCallback callback);
 

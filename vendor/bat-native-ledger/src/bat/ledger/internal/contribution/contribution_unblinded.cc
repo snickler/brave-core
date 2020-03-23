@@ -201,7 +201,7 @@ void Unblinded::Start(const std::string& contribution_id) {
 void Unblinded::GetContributionInfoAndUnblindedTokens(
     const std::string& contribution_id,
     GetContributionInfoAndUnblindedTokensCallback callback) {
-  ledger_->GetAllUnblindedTokens(
+  ledger_->GetSpendableUnblindedTokens(
     std::bind(&Unblinded::OnUnblindedTokens,
         this,
         _1,
@@ -281,7 +281,7 @@ void Unblinded::PrepareTokens(
   }
 
   if (delete_list.size() > 0) {
-    ledger_->DeleteUnblindedTokens(delete_list, [](const ledger::Result _){});
+    ledger_->ClaimUnblindedTokens(delete_list, [](const ledger::Result _){});
   }
 
   if (current_amount < contribution->amount) {
@@ -534,7 +534,7 @@ void Unblinded::OnSendTokens(
     return;
   }
 
-  ledger_->DeleteUnblindedTokens(token_id_list, [](const ledger::Result _){});
+  ledger_->ClaimUnblindedTokens(token_id_list, [](const ledger::Result _){});
   callback(ledger::Result::LEDGER_OK);
 }
 

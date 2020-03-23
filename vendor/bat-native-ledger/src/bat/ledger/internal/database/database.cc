@@ -396,15 +396,15 @@ void Database::SaveUnblindedTokenList(
   unblinded_token_->InsertOrUpdateList(std::move(list), callback);
 }
 
-void Database::GetAllUnblindedTokens(
+void Database::GetSpendableUnblindedTokens(
     ledger::GetUnblindedTokenListCallback callback) {
-  unblinded_token_->GetAllRecords(callback);
+  unblinded_token_->GetSpendableRecords(callback);
 }
 
-void Database::DeleteUnblindedTokens(
+void Database::ClaimUnblindedTokens(
     const std::vector<std::string>& ids,
     ledger::ResultCallback callback) {
-  unblinded_token_->DeleteRecordList(ids, callback);
+  unblinded_token_->ClaimRecordList(ids, callback);
 }
 
 void Database::GetUnblindedTokensByTriggerIds(

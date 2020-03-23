@@ -62,9 +62,9 @@ TEST_F(UnblindedTest, NotEnoughFunds) {
 
   std::vector<std::string> delete_list;
   delete_list.push_back("1");
-  EXPECT_CALL(*mock_ledger_impl_, DeleteUnblindedTokens(delete_list, _));
+  EXPECT_CALL(*mock_ledger_impl_, ClaimUnblindedTokens(delete_list, _));
 
-  ON_CALL(*mock_ledger_impl_, GetAllUnblindedTokens(_))
+  ON_CALL(*mock_ledger_impl_, GetSpendableUnblindedTokens(_))
     .WillByDefault(
       Invoke([](ledger::GetUnblindedTokenListCallback callback) {
         ledger::UnblindedTokenList list;
@@ -88,9 +88,9 @@ TEST_F(UnblindedTest, PromotionExpiredDeleteToken) {
 
   std::vector<std::string> delete_list;
   delete_list.push_back("1");
-  EXPECT_CALL(*mock_ledger_impl_, DeleteUnblindedTokens(delete_list, _));
+  EXPECT_CALL(*mock_ledger_impl_, ClaimUnblindedTokens(delete_list, _));
 
-  ON_CALL(*mock_ledger_impl_, GetAllUnblindedTokens(_))
+  ON_CALL(*mock_ledger_impl_, GetSpendableUnblindedTokens(_))
       .WillByDefault(
         Invoke([](ledger::GetUnblindedTokenListCallback callback) {
           ledger::UnblindedTokenList list;
@@ -119,9 +119,9 @@ TEST_F(UnblindedTest, PromotionExpiredDeleteTokensNotEnoughFunds) {
   std::vector<std::string> delete_list;
   delete_list.push_back("1");
   delete_list.push_back("2");
-  EXPECT_CALL(*mock_ledger_impl_, DeleteUnblindedTokens(delete_list, _));
+  EXPECT_CALL(*mock_ledger_impl_, ClaimUnblindedTokens(delete_list, _));
 
-  ON_CALL(*mock_ledger_impl_, GetAllUnblindedTokens(_))
+  ON_CALL(*mock_ledger_impl_, GetSpendableUnblindedTokens(_))
       .WillByDefault(
         Invoke([](ledger::GetUnblindedTokenListCallback callback) {
           ledger::UnblindedTokenList list;
