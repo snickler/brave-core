@@ -23,12 +23,12 @@ namespace ads {
 
 class AdsTabsTest : public ::testing::Test {
  protected:
-  std::unique_ptr<MockAdsClient> mock_ads_client_;
+  std::unique_ptr<AdsClientMock> ads_client_mock_;
   std::unique_ptr<AdsImpl> ads_;
 
   AdsTabsTest() :
-      mock_ads_client_(std::make_unique<MockAdsClient>()),
-      ads_(std::make_unique<AdsImpl>(mock_ads_client_.get())) {
+      ads_client_mock_(std::make_unique<AdsClientMock>()),
+      ads_(std::make_unique<AdsImpl>(ads_client_mock_.get())) {
   }
 
   ~AdsTabsTest() override {
@@ -42,10 +42,10 @@ class AdsTabsTest : public ::testing::Test {
     // Code here will be called immediately after the constructor (right before
     // each test)
 
-    EXPECT_CALL(*mock_ads_client_, IsEnabled())
+    EXPECT_CALL(*ads_client_mock_, IsEnabled())
         .WillRepeatedly(Return(true));
 
-    EXPECT_CALL(*mock_ads_client_, Load(_, _))
+    EXPECT_CALL(*ads_client_mock_, Load(_, _))
         .WillRepeatedly(
             Invoke([this](
                 const std::string& name,
@@ -62,7 +62,7 @@ class AdsTabsTest : public ::testing::Test {
               callback(SUCCESS, value);
             }));
 
-    ON_CALL(*mock_ads_client_, Save(_, _, _))
+    ON_CALL(*ads_client_mock_, Save(_, _, _))
         .WillByDefault(
             Invoke([](
                 const std::string& name,
@@ -71,7 +71,7 @@ class AdsTabsTest : public ::testing::Test {
               callback(SUCCESS);
             }));
 
-    EXPECT_CALL(*mock_ads_client_, LoadUserModelForLanguage(_, _))
+    EXPECT_CALL(*ads_client_mock_, LoadUserModelForLanguage(_, _))
         .WillRepeatedly(
             Invoke([this](
                 const std::string& language,
@@ -91,7 +91,7 @@ class AdsTabsTest : public ::testing::Test {
               callback(SUCCESS, value);
             }));
 
-    EXPECT_CALL(*mock_ads_client_, LoadJsonSchema(_))
+    EXPECT_CALL(*ads_client_mock_, LoadJsonSchema(_))
         .WillRepeatedly(
             Invoke([this](
                 const std::string& name) -> std::string {
@@ -179,10 +179,10 @@ TEST_F(AdsTabsTest, TabUpdated_Incognito) {
   // Arrange
   auto expected_last_user_activity = ads_->client_->GetLastUserActivity();
 
-  EXPECT_CALL(*mock_ads_client_, Save(_, _, _))
+  EXPECT_CALL(*ads_client_mock_, Save(_, _, _))
       .Times(0);
 
-  EXPECT_CALL(*mock_ads_client_, EventLog(_))
+  EXPECT_CALL(*ads_client_mock_, EventLog(_))
       .Times(0);
 
   // Act
@@ -197,10 +197,10 @@ TEST_F(AdsTabsTest, TabUpdated_InactiveIncognito) {
   // Arrange
   auto expected_last_user_activity = ads_->client_->GetLastUserActivity();
 
-  EXPECT_CALL(*mock_ads_client_, Save(_, _, _))
+  EXPECT_CALL(*ads_client_mock_, Save(_, _, _))
       .Times(0);
 
-  EXPECT_CALL(*mock_ads_client_, EventLog(_))
+  EXPECT_CALL(*ads_client_mock_, EventLog(_))
       .Times(0);
 
   // Act
@@ -215,10 +215,10 @@ TEST_F(AdsTabsTest, TabUpdated_Active) {
   // Arrange
   auto last_user_activity = ads_->client_->GetLastUserActivity();
 
-  EXPECT_CALL(*mock_ads_client_, Save(_, _, _))
+  EXPECT_CALL(*ads_client_mock_, Save(_, _, _))
       .Times(3);
 
-  EXPECT_CALL(*mock_ads_client_, EventLog(_))
+  EXPECT_CALL(*ads_client_mock_, EventLog(_))
       .Times(1);
 
   // Act
@@ -233,10 +233,10 @@ TEST_F(AdsTabsTest, TabUpdated_Inactive) {
   // Arrange
   auto last_user_activity = ads_->client_->GetLastUserActivity();
 
-  EXPECT_CALL(*mock_ads_client_, Save(_, _, _))
+  EXPECT_CALL(*ads_client_mock_, Save(_, _, _))
       .Times(1);
 
-  EXPECT_CALL(*mock_ads_client_, EventLog(_))
+  EXPECT_CALL(*ads_client_mock_, EventLog(_))
       .Times(1);
 
   // Act
@@ -251,7 +251,7 @@ TEST_F(AdsTabsTest, TabClosed_WhileMediaIsPlaying) {
   // Arrange
   ads_->OnMediaPlaying(1);
 
-  EXPECT_CALL(*mock_ads_client_, EventLog(_))
+  EXPECT_CALL(*ads_client_mock_, EventLog(_))
       .Times(1);
 
   // Act
