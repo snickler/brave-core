@@ -17,6 +17,7 @@ Polymer({
   behaviors: [
     WebUIListenerBehavior,
     PrefsBehavior,
+    settings.RouteObserverBehavior,
   ],
 
   properties: {
@@ -50,6 +51,38 @@ Polymer({
       reflectToAttribute: true,
     },
 
+    passphrase: {
+      type: String,
+      value: '',
+      notify: true,
+    },
+
+    /** @private */
+    showSyncCodeSetupDialog_: {
+      type: Boolean,
+      value: false,
+    },
+
+    /** @private */
+    showHaveSyncCodeDialog_: {
+      type: Boolean,
+      value: false,
+    },
+  },
+
+  /** @private {?settings.SyncBrowserProxy} */
+  syncBrowserProxy_: null,
+
+  created: function() {
+    this.syncBrowserProxy_ = settings.SyncBrowserProxyImpl.getInstance();
+  },
+
+  /** @protected */
+  currentRouteChanged: function() {
+    if (settings.getCurrentRoute() != settings.routes.BRAVE_SYNC_SETUP) {
+      this.showSyncCodeSetupDialog_ = false;
+      this.showHaveSyncCodeDialog_ = false;
+    }
   },
 
   /**
@@ -115,22 +148,6 @@ Polymer({
         !!this.syncStatus.signedIn;
   },
 
-  /**
-   * @return {boolean}
-   * @private
-   */
-  shouldShowErrorActionButton_: function() {
-    if (this.embeddedInSubpage &&
-        this.syncStatus.statusAction ==
-            settings.StatusAction.ENTER_PASSPHRASE) {
-      // In a subpage the passphrase button is not required.
-      return false;
-    }
-    return !this.hideButtons && !this.showSetupButtons_ &&
-        !!this.syncStatus.signedIn && !!this.syncStatus.hasError &&
-        this.syncStatus.statusAction != settings.StatusAction.NO_ACTION;
-  },
-
 
   /** @private */
   onErrorButtonTap_: function() {
@@ -178,6 +195,42 @@ Polymer({
 
   /** @private */
   onSetupConfirm_: function() {
+    if (!this.passphrase) {
+      this.passphrase = this.$$('#enterSyncCode').value;
+      console.error(this.passphrase);
+    }
     this.fire('sync-setup-done', true);
+  },
+
+  /** @private */
+  onSyncCodeSetupDialogClose_: function() {
+    this.showSyncCodeSetupDialog_ = false;
+  },
+
+  /** @private */
+  onHaveSyncCodeDialogClose_: function() {
+    this.showHaveSyncCodeDialog_ = false;
+  },
+
+  /** @private */
+  onSyncCodeSteupDialogCopy_: function() {
+    navigator.clipboard.writeText(this.$$('#syncCode').value);
+  },
+
+  /** @private */
+  onStartANewSyncChain_: function() {
+    this.syncBrowserProxy_.getSyncCode().then((syncCode) => {
+      this.passphrase = syncCode;
+    })
+    this.showSyncCodeSetupDialog_ = true;
+    Polymer.dom.flush();
+    this.$$('#syncCodeSetup').showModal();
+  },
+
+  /** @private */
+  onHaveSyncCode_: function() {
+    this.showHaveSyncCodeDialog_ = true;
+    Polymer.dom.flush();
+    this.$$('#haveSyncCode').showModal();
   },
 });

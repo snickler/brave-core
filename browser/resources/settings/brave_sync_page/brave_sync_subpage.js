@@ -5,16 +5,6 @@
 (function() {
 
 /**
- * Names of the radio buttons which allow the user to choose their encryption
- * mechanism.
- * @enum {string}
- */
-const RadioButtonNames = {
-  ENCRYPT_WITH_GOOGLE: 'encrypt-with-google',
-  ENCRYPT_WITH_PASSPHRASE: 'encrypt-with-passphrase',
-};
-
-/**
  * @fileoverview
  * 'settings-sync-page' is the settings page containing sync settings.
  */
@@ -73,39 +63,10 @@ Polymer({
     },
 
     /**
-     * Whether the "create passphrase" inputs should be shown. These inputs
-     * give the user the opportunity to use a custom passphrase instead of
-     * authenticating with their Google credentials.
-     * @private
-     */
-    creatingNewPassphrase_: {
-      type: Boolean,
-      value: true,
-    },
-
-    /**
      * The passphrase input field value.
      * @private
      */
     passphrase_: {
-      type: String,
-      value: '',
-    },
-
-    /**
-     * The passphrase confirmation input field value.
-     * @private
-     */
-    confirmation_: {
-      type: String,
-      value: '',
-    },
-
-    /**
-     * The existing passphrase input field value.
-     * @private
-     */
-    existingPassphrase_: {
       type: String,
       value: '',
     },
@@ -128,12 +89,6 @@ Polymer({
     showSetupCancelDialog_: {
       type: Boolean,
       value: false,
-    },
-
-    disableEncryptionOptions_: {
-      type: Boolean,
-      computed: 'computeDisableEncryptionOptions_(' +
-          'syncPrefs, syncStatus)',
     },
   },
 
@@ -252,6 +207,7 @@ Polymer({
 
   /** @protected */
   currentRouteChanged: function() {
+    console.error(settings.getCurrentRoute());
     if (settings.getCurrentRoute() == settings.routes.BRAVE_SYNC_SETUP) {
       this.onNavigateToPage_();
       return;
@@ -364,81 +320,6 @@ Polymer({
   handleSyncPrefsChanged_: function(syncPrefs) {
     this.syncPrefs = syncPrefs;
     this.pageStatus_ = settings.PageStatus.CONFIGURE;
-
-    // Hide the new passphrase box if (a) full data encryption is enabled,
-    // (b) encrypting all data is not allowed (so far, only applies to
-    // supervised accounts), or (c) the user is a supervised account.
-    if (this.syncPrefs.encryptAllData ||
-        !this.syncPrefs.encryptAllDataAllowed ||
-        (this.syncStatus && this.syncStatus.supervisedUser)) {
-      this.creatingNewPassphrase_ = false;
-    }
-  },
-
-  /** @private */
-  onActivityControlsTap_: function() {
-    this.browserProxy_.openActivityControlsUrl();
-  },
-
-  /**
-   * @param {string} passphrase The passphrase input field value
-   * @param {string} confirmation The passphrase confirmation input field value.
-   * @return {boolean} Whether the passphrase save button should be enabled.
-   * @private
-   */
-  isSaveNewPassphraseEnabled_: function(passphrase, confirmation) {
-    return passphrase !== '' && confirmation !== '';
-  },
-
-  /**
-   * Sends the newly created custom sync passphrase to the browser.
-   * @private
-   * @param {!Event} e
-   */
-  onSaveNewPassphraseTap_: function(e) {
-    assert(this.creatingNewPassphrase_);
-
-    // Ignore events on irrelevant elements or with irrelevant keys.
-    if (e.target.tagName != 'CR-BUTTON' && e.target.tagName != 'CR-INPUT') {
-      return;
-    }
-    if (e.type == 'keypress' && e.key != 'Enter') {
-      return;
-    }
-
-    // If a new password has been entered but it is invalid, do not send the
-    // sync state to the API.
-    if (!this.validateCreatedPassphrases_()) {
-      return;
-    }
-
-    this.syncPrefs.encryptAllData = true;
-    this.syncPrefs.setNewPassphrase = true;
-    this.syncPrefs.passphrase = this.passphrase_;
-
-    this.browserProxy_.setSyncEncryption(this.syncPrefs)
-        .then(this.handlePageStatusChanged_.bind(this));
-  },
-
-  /**
-   * Sends the user-entered existing password to re-enable sync.
-   * @private
-   * @param {!Event} e
-   */
-  onSubmitExistingPassphraseTap_: function(e) {
-    if (e.type == 'keypress' && e.key != 'Enter') {
-      return;
-    }
-
-    assert(!this.creatingNewPassphrase_);
-
-    this.syncPrefs.setNewPassphrase = false;
-
-    this.syncPrefs.passphrase = this.existingPassphrase_;
-    this.existingPassphrase_ = '';
-
-    this.browserProxy_.setSyncEncryption(this.syncPrefs)
-        .then(this.handlePageStatusChanged_.bind(this));
   },
 
   /**
@@ -474,59 +355,12 @@ Polymer({
   },
 
   /**
-   * Checks the supplied passphrases to ensure that they are not empty and that
-   * they match each other. Additionally, displays error UI if they are invalid.
-   * @return {boolean} Whether the check was successful (i.e., that the
-   *     passphrases were valid).
-   * @private
-   */
-  validateCreatedPassphrases_: function() {
-    const emptyPassphrase = !this.passphrase_;
-    const mismatchedPassphrase = this.passphrase_ != this.confirmation_;
-
-    this.$$('#passphraseInput').invalid = emptyPassphrase;
-    this.$$('#passphraseConfirmationInput').invalid =
-        !emptyPassphrase && mismatchedPassphrase;
-
-    return !emptyPassphrase && !mismatchedPassphrase;
-  },
-
-  /**
    * @return {boolean}
    * @private
    */
   shouldShowSyncAccountControl_: function() {
     return this.syncStatus !== undefined &&
         !!this.syncStatus.syncSystemEnabled;
-  },
-
-  /**
-   * @return {boolean}
-   * @private
-   */
-  shouldShowExistingPassphraseBelowAccount_: function() {
-    return this.syncPrefs !== undefined && !!this.syncPrefs.passphraseRequired;
-  },
-
-  /**
-   * Whether we should disable the radio buttons that allow choosing the
-   * encryption options for Sync.
-   * We disable the buttons if:
-   * (a) full data encryption is enabled, or,
-   * (b) full data encryption is not allowed (so far, only applies to
-   * supervised accounts), or,
-   * (c) current encryption keys are missing, or,
-   * (d) the user is a supervised account.
-   * @return {boolean}
-   * @private
-   */
-  computeDisableEncryptionOptions_: function() {
-    return !!(
-        (this.syncPrefs &&
-         (this.syncPrefs.encryptAllData ||
-          !this.syncPrefs.encryptAllDataAllowed ||
-          this.syncPrefs.trustedVaultKeysRequired)) ||
-        (this.syncStatus && this.syncStatus.supervisedUser));
   },
 
   /**
@@ -537,27 +371,23 @@ Polymer({
   onSyncSetupDone_: function(e) {
     if (e.detail) {
       this.didAbort_ = false;
-      chrome.metricsPrivate.recordUserAction(
-          'Signin_Signin_ConfirmAdvancedSyncSettings');
+
+      this.syncPrefs.encryptAllData = true;
+      this.syncPrefs.setNewPassphrase = true;
+      this.syncPrefs.passphrase = this.passphrase_;
+
+      if (this.syncPrefs.passphraseRequired) {
+        this.syncPrefs.setNewPassphrase = false;
+      }
+      console.error('SSS: ' + this.passphrase_);
+      this.browserProxy_.setSyncCode(this.passphrase_);
+
+      this.browserProxy_.setSyncEncryption(this.syncPrefs)
+        .then(this.handlePageStatusChanged_.bind(this));
     } else {
       this.setupCancelConfirmed_ = true;
-      chrome.metricsPrivate.recordUserAction(
-          'Signin_Signin_CancelAdvancedSyncSettings');
     }
-    settings.navigateTo(settings.routes.BASIC);
-  },
-
-  /**
-   * Focuses the passphrase input element if it is available and the page is
-   * visible.
-   * @private
-   */
-  focusPassphraseInput_: function() {
-    const passphraseInput =
-        /** @type {!CrInputElement} */ (this.$$('#existingPassphraseInput'));
-    if (passphraseInput && settings.getCurrentRoute() == settings.routes.BRAVE_SYNC_SETUP) {
-      passphraseInput.focus();
-    }
+    settings.navigateTo(settings.routes.BRAVE_SYNC);
   },
 });
 

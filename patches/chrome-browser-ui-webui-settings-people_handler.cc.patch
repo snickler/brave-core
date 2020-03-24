@@ -1,8 +1,27 @@
 diff --git a/chrome/browser/ui/webui/settings/people_handler.cc b/chrome/browser/ui/webui/settings/people_handler.cc
-index 6dc8e03ca5ac6e10a59708d75796fa99a24eada1..f00287f65870cc765161bbbee581c09431145d64 100644
+index 6dc8e03ca5ac6e10a59708d75796fa99a24eada1..1b49137373d81d61900251436ff4ec466ea3c43d 100644
 --- a/chrome/browser/ui/webui/settings/people_handler.cc
 +++ b/chrome/browser/ui/webui/settings/people_handler.cc
-@@ -1045,6 +1045,7 @@ void PeopleHandler::MarkFirstSetupComplete() {
+@@ -299,8 +299,8 @@ void PeopleHandler::RegisterMessages() {
+       base::BindRepeating(&PeopleHandler::HandleGetSyncStatus,
+                           base::Unretained(this)));
+   web_ui()->RegisterMessageCallback(
+-      "SyncPrefsDispatch",
+-      base::BindRepeating(&PeopleHandler::HandleSyncPrefsDispatch,
++      "SyncSetupGetSyncCode",
++      base::BindRepeating(&PeopleHandler::HandleGetSyncCode,
+                           base::Unretained(this)));
+ #if defined(OS_CHROMEOS)
+   web_ui()->RegisterMessageCallback(
+@@ -337,6 +337,7 @@ void PeopleHandler::RegisterMessages() {
+       "SyncStartKeyRetrieval",
+       base::BindRepeating(&PeopleHandler::HandleStartKeyRetrieval,
+                           base::Unretained(this)));
++  BRAVE_REGISTER_MESSAGES
+ }
+ 
+ void PeopleHandler::OnJavascriptAllowed() {
+@@ -1045,6 +1046,7 @@ void PeopleHandler::MarkFirstSetupComplete() {
  }
  
  bool PeopleHandler::IsProfileAuthNeededOrHasErrors() {
