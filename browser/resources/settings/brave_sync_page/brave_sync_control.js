@@ -51,6 +51,20 @@ Polymer({
       reflectToAttribute: true,
     },
 
+    /** @private */
+    showSetupButtons_: {
+      type: Boolean,
+      computed: 'computeShowSetupButtons_(' +
+      'hideButtons, syncStatus.firstSetupInProgress)',
+    },
+
+    /** @private */
+    viewSyncCodeOnly_: {
+      type: Boolean,
+      computed: 'computeViewSyncCodeOnly_(' +
+      'syncStatus.firstSetupInProgress)',
+    },
+
     passphrase: {
       type: String,
       value: '',
@@ -184,8 +198,16 @@ Polymer({
    */
   computeShowSetupButtons_: function() {
     console.error(this.syncStatus);
-    return true;
+    // return true;
     return !this.hideButtons && !!this.syncStatus.firstSetupInProgress;
+  },
+
+  /**
+   * @return {boolean}
+   * @private
+   */
+  computeViewSyncCodeOnly_: function() {
+    return !this.syncStatus.firstSetupInProgress;
   },
 
   /** @private */

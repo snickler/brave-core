@@ -171,6 +171,17 @@ Polymer({
   },
 
   /**
+   * Handler for when the sync state is pushed from the browser.
+   * @param {?settings.SyncStatus} syncStatus
+   * @private
+   */
+  handleSyncStatus_: function(syncStatus) {
+    console.error(syncStatus);
+    this.syncStatus = syncStatus;
+  },
+
+
+  /**
    * @return {boolean}
    * @private
    */
@@ -264,6 +275,9 @@ Polymer({
   onNavigateToPage_: function() {
     assert(settings.getCurrentRoute() == settings.routes.BRAVE_SYNC_SETUP);
 
+    this.browserProxy_.getSyncStatus().then(
+        this.handleSyncStatus_.bind(this));
+
     if (this.beforeunloadCallback_) {
       return;
     }
@@ -343,10 +357,6 @@ Polymer({
       case settings.PageStatus.PASSPHRASE_FAILED:
         if (this.pageStatus_ == this.pages_.CONFIGURE && this.syncPrefs &&
             this.syncPrefs.passphraseRequired) {
-          const passphraseInput = /** @type {!CrInputElement} */ (
-              this.$$('#existingPassphraseInput'));
-          passphraseInput.invalid = true;
-          passphraseInput.focusInput();
         }
         return;
     }
@@ -379,7 +389,6 @@ Polymer({
       if (this.syncPrefs.passphraseRequired) {
         this.syncPrefs.setNewPassphrase = false;
       }
-      console.error('SSS: ' + this.passphrase_);
       this.browserProxy_.setSyncCode(this.passphrase_);
 
       this.browserProxy_.setSyncEncryption(this.syncPrefs)

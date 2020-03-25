@@ -33,27 +33,11 @@ Polymer({
     pageVisibility: Object,
   },
 
-  /** @private {?settings.SyncBrowserProxy} */
-  syncBrowserProxy_: null,
-
   /** @override */
   attached: function() {
-    this.syncBrowserProxy_ = settings.SyncBrowserProxyImpl.getInstance();
-    this.syncBrowserProxy_.getSyncStatus().then(
-        this.handleSyncStatus_.bind(this));
     this.addWebUIListener('sync-settings-saved', () => {
     });
   },
-
-  /**
-   * Handler for when the sync state is pushed from the browser.
-   * @param {?settings.SyncStatus} syncStatus
-   * @private
-   */
-  handleSyncStatus_: function(syncStatus) {
-    this.syncStatus = syncStatus;
-  },
-
   /** @private */
   onSyncTap_: function() {
     // Users can go to sync subpage regardless of sync status.

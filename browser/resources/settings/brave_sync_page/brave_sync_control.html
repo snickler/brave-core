@@ -34,6 +34,12 @@
           I have a Sync Code
         </cr-button>
     </div>
+    <div id="after-setup" hidden="[[showSetupButtons_]]">
+        <cr-button class="action-button"
+                   on-click="onStartANewSyncChain_">
+          View Sync Code
+        </cr-button>
+    </div>
     <template is="dom-if" if="[[showSyncCodeSetupDialog_]]" restamp>
       <cr-dialog id="syncCodeSetup" on-close="onSyncCodeSetupDialogClose_"
           ignore-popstate>
@@ -47,7 +53,7 @@
             </cr-button>
           </div>
         </div>
-        <div slot="button-container">
+        <div slot="button-container" hidden="[[viewSyncCodeOnly_]]">
           <cr-button on-click="onSetupCancel_">$i18n{cancel}</cr-button>
           <cr-button class="action-button" on-click="onSetupConfirm_">
             $i18n{confirm}
