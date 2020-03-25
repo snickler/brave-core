@@ -4,9 +4,8 @@
 
 
 #include "brave/components/omnibox/browser/brave_autocomplete_controller.h"
+#include "brave/components/omnibox/browser/suggested_sites_provider.h"
 #include "brave/components/omnibox/browser/topsites_provider.h"
-
-
 
 BraveAutocompleteController::BraveAutocompleteController(
     std::unique_ptr<AutocompleteProviderClient> provider_client,
@@ -19,6 +18,7 @@ BraveAutocompleteController::BraveAutocompleteController(
  {
     if (provider_types & AutocompleteProvider::TYPE_SEARCH) {
       providers_.push_back(new TopSitesProvider(provider_client_.get()));
+      providers_.push_back(new SuggestedSitesProvider(provider_client_.get()));
     }
  }
 
