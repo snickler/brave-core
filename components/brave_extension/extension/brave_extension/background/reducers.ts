@@ -6,10 +6,12 @@ import { combineReducers } from 'redux'
 
 import shieldsPanelReducer from './reducers/shieldsPanelReducer'
 import dappDetectionReducer from './reducers/dappDetectionReducer'
+import binanceOauthReducer from './reducers/binanceOauthReducer'
 import runtimeReducer from './reducers/runtimeReducer'
 
 export default combineReducers({
   shieldsPanel: shieldsPanelReducer,
   dappDetection: dappDetectionReducer,
+  binanceOauth: binanceOauthReducer,
   runtime: runtimeReducer
 })

@@ -83,6 +83,19 @@ int OnBeforeURLRequest_CommonStaticRedirectWorkForGURL(
     return net::OK;
   }
 
+  /*
+  LOG(ERROR) << "-----1";
+  if (binance_oauth_pattern.MatchesURL(request_url)) {
+    LOG(ERROR) << "-----2";
+    GURL::Replacements replacements;
+      replacements.SetQueryStr(request_url.query_piece());
+    *new_url = GURL(kBinanceOauthURLHandler);
+      //.ReplaceComponents(replacements);
+    LOG(ERROR) << "---3: " << *new_url;
+    return net::OK;
+  }
+  */
+
   if (chromecast_pattern.MatchesURL(request_url)) {
     replacements.SetSchemeStr("https");
     replacements.SetHostStr(kBraveRedirectorProxy);

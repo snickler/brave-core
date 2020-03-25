@@ -53,6 +53,15 @@
       "run_at": "document_start",
       "all_frames": true
     }, {
+      "matches": [
+        "https://brave.com/binance/oauth/callback?*"
+      ],
+      "js": [
+        "out/binance_oauth.bundle.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }, {
       "run_at": "document_start",
       "all_frames": true,
       "matches": [

@@ -11,6 +11,7 @@ transpile_web_ui("brave_extension") {
     ["content_dapps", rebase_path("content_dapps.ts")],
     ["content_cosmetic", rebase_path("content_cosmetic.ts")],
     ["webstore", rebase_path("webstore.ts")],
+    ["binance_oauth", rebase_path("binance_oauth.ts")],
   ]
 
   # what is the directory / pack name
