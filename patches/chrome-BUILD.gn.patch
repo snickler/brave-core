@@ -1,8 +1,8 @@
 diff --git a/chrome/BUILD.gn b/chrome/BUILD.gn
-index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdde7baa50b 100644
+index dc1faa8f3a75fa958201372f2df674c44a94b4e0..557b027c08dfc3c1ce91bfae348c6112fdaf720f 100644
 --- a/chrome/BUILD.gn
 +++ b/chrome/BUILD.gn
-@@ -184,6 +184,10 @@ if (!is_android && !is_mac) {
+@@ -169,6 +169,10 @@ if (!is_android && !is_mac) {
          "common/crash_keys.cc",
          "common/crash_keys.h",
        ]
@@ -13,7 +13,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
  
        deps += [
          ":chrome_dll",
-@@ -534,6 +538,11 @@ if (is_win) {
+@@ -512,6 +516,11 @@ if (is_win) {
      ]
    }
  
@@ -25,7 +25,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
    mac_app_bundle("chrome_app") {
      output_name = chrome_product_full_name
  
-@@ -575,6 +584,7 @@ if (is_win) {
+@@ -553,6 +562,7 @@ if (is_win) {
        data_deps = [ ":chrome_framework" ]
      }
    }
@@ -33,7 +33,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
  
    compiled_action("chrome_app_strings") {
      tool = "//chrome/tools/build/mac:infoplist_strings_tool"
-@@ -602,7 +612,7 @@ if (is_win) {
+@@ -580,7 +590,7 @@ if (is_win) {
      args =
          [
            "-b",
@@ -42,7 +42,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
            "-v",
            rebase_path(chrome_version_file, root_build_dir),
            "-g",
-@@ -670,7 +680,7 @@ if (is_win) {
+@@ -648,7 +658,7 @@ if (is_win) {
        # framework itself, that would cause a cyclical dependency. Instead,
        # this dependency directly copies the file into the framework's
        # resources directory.
@@ -51,7 +51,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
      }
    }
  
-@@ -1115,6 +1125,10 @@ if (is_win) {
+@@ -1098,6 +1108,10 @@ if (is_win) {
      if (is_chrome_branded) {
        deps += [ ":default_apps" ]
      }
@@ -62,7 +62,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
  
      ldflags = [ "-Wl,-install_name,@executable_path/../Frameworks/$chrome_framework_name.framework/Versions/$chrome_version_full/$chrome_framework_name" ]
  
-@@ -1272,6 +1286,7 @@ if (is_win) {
+@@ -1255,6 +1269,7 @@ if (is_win) {
  
  group("browser_dependencies") {
    public_deps = [
@@ -70,7 +70,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
      "//chrome/browser",
      "//chrome/common",
      "//components/gwp_asan/buildflags",
-@@ -1344,12 +1359,13 @@ group("child_dependencies") {
+@@ -1327,12 +1342,13 @@ group("child_dependencies") {
        # this is OK because all of content is linked into one library.
        "//content/browser",
      ]
@@ -85,7 +85,7 @@ index fe09f99a91e3b1d2abfb335ec2771d1ed8592d87..e2ddd668d9c9a30708a348b94f7d1bdd
      output = "$target_gen_dir/chrome_exe_version.rc"
    }
  
-@@ -1403,6 +1419,7 @@ group("resources") {
+@@ -1386,6 +1402,7 @@ group("resources") {
      "//chrome/browser:resources",
      "//chrome/common:resources",
      "//chrome/renderer:resources",
