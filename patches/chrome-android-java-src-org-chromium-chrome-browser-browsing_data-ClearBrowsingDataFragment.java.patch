@@ -1,8 +1,8 @@
-diff --git a/chrome/android/java/src/org/chromium/chrome/browser/settings/privacy/ClearBrowsingDataFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/settings/privacy/ClearBrowsingDataFragment.java
-index a6584c1cdc727226d6aac1e2bc1ccdd87720114e..bda4abcb9e676435402cf93205cfa1d4201682a8 100644
---- a/chrome/android/java/src/org/chromium/chrome/browser/settings/privacy/ClearBrowsingDataFragment.java
-+++ b/chrome/android/java/src/org/chromium/chrome/browser/settings/privacy/ClearBrowsingDataFragment.java
-@@ -52,7 +52,7 @@ import java.util.Set;
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
+index 2569ed7ae15e5ee4ad17681982edbf545b2f9efc..eb424e7319ea6ccccb2c479f522652fe11ed9967 100644
+--- a/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/browsing_data/ClearBrowsingDataFragment.java
+@@ -48,7 +48,7 @@ import java.util.Set;
   * The user can choose which types of data to clear (history, cookies, etc), and the time range
   * from which to clear data.
   */
@@ -11,7 +11,7 @@ index a6584c1cdc727226d6aac1e2bc1ccdd87720114e..bda4abcb9e676435402cf93205cfa1d4
          implements BrowsingDataBridge.OnClearBrowsingDataListener,
                     Preference.OnPreferenceClickListener, Preference.OnPreferenceChangeListener {
      /**
-@@ -224,7 +224,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
+@@ -220,7 +220,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
      /**
       * @return All available {@link DialogOption} entries.
       */
@@ -20,7 +20,7 @@ index a6584c1cdc727226d6aac1e2bc1ccdd87720114e..bda4abcb9e676435402cf93205cfa1d4
          assert DialogOption.CLEAR_HISTORY == 0;
  
          Set<Integer> all = new ArraySet<>();
-@@ -235,6 +235,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
+@@ -231,6 +231,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
      }
  
      static @BrowsingDataType int getDataType(@DialogOption int type) {
@@ -28,7 +28,7 @@ index a6584c1cdc727226d6aac1e2bc1ccdd87720114e..bda4abcb9e676435402cf93205cfa1d4
          switch (type) {
              case DialogOption.CLEAR_CACHE:
                  return BrowsingDataType.CACHE;
-@@ -254,6 +255,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
+@@ -250,6 +251,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
      }
  
      static String getPreferenceKey(@DialogOption int type) {
@@ -36,7 +36,7 @@ index a6584c1cdc727226d6aac1e2bc1ccdd87720114e..bda4abcb9e676435402cf93205cfa1d4
          switch (type) {
              case DialogOption.CLEAR_CACHE:
                  return "clear_cache_checkbox";
-@@ -273,6 +275,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
+@@ -269,6 +271,7 @@ public abstract class ClearBrowsingDataFragment extends PreferenceFragmentCompat
      }
  
      static @DrawableRes int getIcon(@DialogOption int type) {
