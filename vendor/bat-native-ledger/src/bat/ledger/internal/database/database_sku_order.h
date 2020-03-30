@@ -34,6 +34,10 @@ class DatabaseSKUOrder: public DatabaseTable {
       const std::string& order_id,
       ledger::GetSKUOrderCallback callback);
 
+  void GetRecordByContributionId(
+      const std::string& contribution_id,
+      ledger::GetSKUOrderCallback callback);
+
  private:
   bool CreateTableV19(ledger::DBTransaction* transaction);
 

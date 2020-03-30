@@ -37,6 +37,10 @@ class SKU {
       ledger::ExternalWalletPtr wallet,
       ledger::SKUOrderCallback callback);
 
+  void Retry(
+      const std::string& order_id,
+      ledger::SKUOrderCallback callback);
+
  private:
   void GetOrder(
       const ledger::Result result,

@@ -1493,16 +1493,25 @@ void LedgerImpl::GetContributionReport(
   bat_database_->GetContributionReport(month, year, callback);
 }
 
-void LedgerImpl::GetIncompleteContributions(
-    const ledger::ContributionProcessor processor,
+void LedgerImpl::GetNotCompletedContributions(
     ledger::ContributionInfoListCallback callback) {
-  bat_database_->GetIncompleteContributions(processor, callback);
+  bat_database_->GetNotCompletedContributions(callback);
 }
 
 void LedgerImpl::GetContributionInfo(
     const std::string& contribution_id,
     ledger::GetContributionInfoCallback callback) {
   bat_database_->GetContributionInfo(contribution_id, callback);
+}
+
+void LedgerImpl::UpdateContributionInfoStep(
+    const std::string& contribution_id,
+    const ledger::ContributionStep step,
+    ledger::ResultCallback callback) {
+  bat_database_->UpdateContributionInfoStep(
+      contribution_id,
+      step,
+      callback);
 }
 
 void LedgerImpl::UpdateContributionInfoStepAndCount(
@@ -1705,6 +1714,12 @@ void LedgerImpl::ProcessSKU(
       items,
       std::move(wallet),
       callback);
+}
+
+void LedgerImpl::GetSKUOrderByContributionId(
+    const std::string& contribution_id,
+    ledger::GetSKUOrderCallback callback) {
+  bat_database_->GetSKUOrderByContributionId(contribution_id, callback);
 }
 
 }  // namespace bat_ledger

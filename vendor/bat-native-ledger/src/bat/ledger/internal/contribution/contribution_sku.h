@@ -29,43 +29,64 @@ class ContributionSKU {
 
   void AutoContribution(
       const std::string& contribution_id,
-      ledger::ExternalWalletPtr wallet);
+      ledger::ExternalWalletPtr wallet,
+      ledger::ResultCallback callback);
 
   void AnonUserFunds(
       const std::string& contribution_id,
-      ledger::ExternalWalletPtr wallet);
+      ledger::ExternalWalletPtr wallet,
+      ledger::ResultCallback callback);
 
   void Merchant(
       const ledger::SKUTransaction& transaction,
       const std::string& destination,
       ledger::TransactionCallback callback);
 
+  void Retry(
+      const ledger::ContributionInfoPtr contribution,
+      ledger::ResultCallback callback);
+
  private:
   void Start(
       const std::string& contribution_id,
       const ledger::SKUOrderItem& item,
       const std::string& destination,
-      ledger::ExternalWalletPtr wallet);
+      ledger::ExternalWalletPtr wallet,
+      ledger::ResultCallback callback);
 
   void GetContributionInfo(
       ledger::ContributionInfoPtr contribution,
       const ledger::SKUOrderItem& item,
       const std::string& destination,
-      const ledger::ExternalWallet& wallet);
+      const ledger::ExternalWallet& wallet,
+      ledger::ResultCallback callback);
 
   void GetOrder(
       const ledger::Result result,
       const std::string& order_id,
+      const std::string& contribution_id,
       ledger::ResultCallback callback);
 
   void OnGetOrder(
       ledger::SKUOrderPtr order,
+      const std::string& contribution_id,
+      ledger::ResultCallback callback);
+
+  void TransactionStepSaved(
+      const ledger::Result result,
+      const std::string& order_string,
       ledger::ResultCallback callback);
 
   void Completed(
       const ledger::Result result,
       const std::string& contribution_id,
-      const ledger::RewardsType type);
+      const ledger::RewardsType type,
+      ledger::ResultCallback callback);
+
+  void CredsStepSaved(
+      const ledger::Result result,
+      const std::string& contribution_id,
+      ledger::ResultCallback callback);
 
   void GetUnblindedTokens(
       ledger::UnblindedTokenList list,
@@ -81,6 +102,11 @@ class ContributionSKU {
   void OnRedeemTokens(
       const ledger::Result result,
       ledger::TransactionCallback callback);
+
+  void OnOrder(
+      ledger::SKUOrderPtr order,
+      const std::string& contribution_string,
+      ledger::ResultCallback callback);
 
   bat_ledger::LedgerImpl* ledger_;  // NOT OWNED
   Contribution* contribution_;   // NOT OWNED

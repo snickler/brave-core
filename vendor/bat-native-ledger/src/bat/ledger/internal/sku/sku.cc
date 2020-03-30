@@ -150,4 +150,10 @@ void SKU::OnTransactionCompleted(
   callback(ledger::Result::LEDGER_OK, order_id);
 }
 
+void SKU::Retry(
+    const std::string& order_id,
+    ledger::SKUOrderCallback callback) {
+  // TODO
+}
+
 }  // namespace braveledger_sku

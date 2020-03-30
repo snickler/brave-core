@@ -596,13 +596,17 @@ class LedgerImpl : public ledger::Ledger {
       const int year,
       ledger::GetContributionReportCallback callback) override;
 
-  void GetIncompleteContributions(
-      const ledger::ContributionProcessor processor,
+  void GetNotCompletedContributions(
       ledger::ContributionInfoListCallback callback);
 
   virtual void GetContributionInfo(
       const std::string& contribution_id,
       ledger::GetContributionInfoCallback callback);
+
+  virtual void UpdateContributionInfoStep(
+      const std::string& contribution_id,
+      const ledger::ContributionStep step,
+      ledger::ResultCallback callback);
 
   virtual void UpdateContributionInfoStepAndCount(
       const std::string& contribution_id,
@@ -718,6 +722,10 @@ class LedgerImpl : public ledger::Ledger {
       const std::vector<ledger::SKUOrderItem>& items,
       ledger::ExternalWalletPtr wallet,
       ledger::SKUOrderCallback callback) override;
+
+  void GetSKUOrderByContributionId(
+      const std::string& contribution_id,
+      ledger::GetSKUOrderCallback callback);
 
  private:
   void InitializeConfirmations(

@@ -11,7 +11,10 @@ enum ContributionStep {
   STEP_COMPLETED = -1,
   STEP_NO = 0,
   STEP_START = 1,
-  STEP_SUGGESTIONS = 2
+  STEP_PREPARE = 2,
+  STEP_RESERVE = 3,
+  STEP_EXTERNAL_TRANSACTION = 4,
+  STEP_CREDS = 5
 };
 
 enum ContributionProcessor {
