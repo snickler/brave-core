@@ -1,0 +1,13 @@
+diff --git a/chrome/browser/permissions/permission_manager_factory.cc b/chrome/browser/permissions/permission_manager_factory.cc
+index 2de8068408624e7a0d5212c99173795e74e0a34a..4432ca3ab9edc8d0d40ae35488b11a343a69a3c0 100644
+--- a/chrome/browser/permissions/permission_manager_factory.cc
++++ b/chrome/browser/permissions/permission_manager_factory.cc
+@@ -152,7 +152,7 @@ KeyedService* PermissionManagerFactory::BuildServiceInstanceFor(
+     content::BrowserContext* context) const {
+   Profile* profile = Profile::FromBrowserContext(context);
+   return new permissions::PermissionManager(profile,
+-                                            CreatePermissionContexts(profile));
++    BRAVE_PERMISSION_MANAGER_FACTORY_BUILD_SERVICE_INSTANCE_FOR);
+ }
+ 
+ content::BrowserContext*
