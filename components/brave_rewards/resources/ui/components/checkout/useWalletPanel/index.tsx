@@ -3,8 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react'
-import { BatColorIcon, PlusIcon } from 'brave-ui/components/icons'
-import { Button } from 'brave-ui/components'
+import { PlusIcon } from 'brave-ui/components/icons'
 
 import { LocaleContext, LocaleData } from '../localeContext'
 import { FormSection } from '../formSection'
@@ -13,7 +12,10 @@ import {
   Content,
   WalletInfoPanel,
   ActionPanel,
+  ActionPanelButton,
   BatAmount,
+  BatSymbol,
+  BatIcon,
   ExchangeAmount,
   LastUpdated,
   NotEnoughFunds,
@@ -26,11 +28,12 @@ interface ActionButtonProps {
 }
 
 function PayWithWalletButton (props: ActionButtonProps) {
+  const handleClick = () => props.onClick()
   return (
-    <Button
+    <ActionPanelButton
       text={props.locale.get('payWithBat')}
       size='medium'
-      onClick={props.onClick}
+      onClick={handleClick}
       type='accent'
       brand='rewards'
     />
@@ -38,11 +41,12 @@ function PayWithWalletButton (props: ActionButtonProps) {
 }
 
 function AddFundsButton (props: ActionButtonProps) {
+  const handleClick = () => props.onClick()
   return (
-    <Button
+    <ActionPanelButton
       text={props.locale.get('addFundsLinkText')}
       size='medium'
-      onClick={props.onClick}
+      onClick={handleClick}
       icon={{ image: <PlusIcon />, position: 'before' }}
       type='accent'
       brand='rewards'
@@ -73,8 +77,11 @@ export function UseWalletPanel (props: UseWalletPanelProps) {
       <FormSection title={locale.get('useTokenBalance')}>
         <Content>
           <WalletInfoPanel hasSufficientFunds={props.hasSufficientFunds}>
-            <BatColorIcon />
-            <BatAmount locale={locale}>{props.balance}</BatAmount>
+            <BatIcon />
+            <BatAmount>
+              {props.balance}
+              <BatSymbol>{locale.get('bat')}</BatSymbol>
+            </BatAmount>
             <ExchangeAmount>{props.balanceConverted}</ExchangeAmount>
             <LastUpdated>{locale.get('updated')} {props.lastUpdated}</LastUpdated>
           </WalletInfoPanel>

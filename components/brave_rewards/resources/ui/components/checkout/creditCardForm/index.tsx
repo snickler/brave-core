@@ -16,6 +16,7 @@ import {
   Expiration,
   SecurityCode,
   SaveThisCard,
+  SaveThisCardLabel,
   InputIconContainer
 } from './style'
 
@@ -85,14 +86,14 @@ export function CreditCardForm (props: CreditCardFormProps) {
         </label>
       </SecurityCode>
       <SaveThisCard>
-        <label>
+        <SaveThisCardLabel>
           <div>
             {locale.get('saveThisCard')}
           </div>
           <div>
             <Toggle checked={saveCardChecked} onToggle={toggleSaveCard} />
           </div>
-        </label>
+        </SaveThisCardLabel>
       </SaveThisCard>
     </Container>
   )

@@ -3,6 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import styled from 'styled-components'
+import { CaratStrongRightIcon } from 'brave-ui/components/icons'
+import Button, { Props as ButtonProps } from 'brave-ui/components/buttonsIndicators/button'
+import { ComponentType } from 'react'
 
 export const ContinueBox = styled.div`
   font-size: 12px;
@@ -19,14 +22,14 @@ export const ContinueBoxLink = styled.div`
   flex-grow: 1;
   text-align: right;
   min-width: 215px;
+`
 
-  svg {
-    position: relative;
-    top: 2px;
-    left: 12px;
-    height: 11px;
-    width: 11px;
-  }
+export const RightIcon = styled(CaratStrongRightIcon)`
+  position: relative;
+  top: 2px;
+  left: 12px;
+  height: 11px;
+  width: 11px;
 `
 
 export const ConfirmButtonRow = styled.div<{ showBackLink?: boolean }>`
@@ -34,18 +37,22 @@ export const ConfirmButtonRow = styled.div<{ showBackLink?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: ${p => p.showBackLink ? 'space-between' : 'center'};
-
-  button {
-    min-width: ${p => p.showBackLink ? '231px' : '322px'};
-  }
 }
+`
+
+interface ConfirmButtonProps extends ButtonProps {
+  showBackLink?: boolean
+}
+
+export const ConfirmButton = styled(Button as ComponentType<ConfirmButtonProps>)`
+  min-width: ${p => p.showBackLink ? '231px' : '322px'};
 `
 
 export const TermsOfSale = styled.div`
   font-family: ${p => p.theme.fontFamily.body};
   font-size: 12px;
   text-align: center;
-  padding-top: 10px;
+  padding-top: 12px;
 
   a {
     font-weight: bold;

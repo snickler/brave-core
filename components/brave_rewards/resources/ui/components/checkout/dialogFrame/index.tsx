@@ -3,7 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react'
-import { CloseStrokeIcon, BatColorIcon } from 'brave-ui/components/icons'
+import { CloseStrokeIcon } from 'brave-ui/components/icons'
 
 import { LocaleContext } from '../localeContext'
 
@@ -11,7 +11,7 @@ import {
   MainPanel,
   Content,
   TopBar,
-  DialogTitle,
+  DialogTitleIcon,
   CloseButton,
   BatText
 } from './style'
@@ -30,10 +30,8 @@ export function DialogFrame (props: DialogFrameProps) {
       <TopBar>
         {
           !props.showTitle ? null : <>
-            <DialogTitle>
-              <BatColorIcon />
-              <BatText>{locale.get('bat')}</BatText> {locale.get('checkout')}
-            </DialogTitle>
+            <DialogTitleIcon />
+            <BatText>{locale.get('bat')}</BatText> {locale.get('checkout')}
           </>
         }
         <CloseButton onClick={props.onClose}>

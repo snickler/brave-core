@@ -3,6 +3,9 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import styled from 'styled-components'
+import { BatColorIcon } from 'brave-ui/components/icons'
+import Button, { Props as ButtonProps } from 'brave-ui/components/buttonsIndicators/button'
+import { ComponentType } from 'react'
 
 export const Subtitle = styled.div`
   text-align: center;
@@ -45,11 +48,11 @@ export const PurchaseButtonRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+`
 
-  button {
-    padding-left: 42px;
-    padding-right: 42px;
-  }
+export const AddFundsButton = styled(Button as ComponentType<ButtonProps>)`
+  padding-left: 42px;
+  padding-right: 42px;
 `
 
 export const ExchangeRateDisplay = styled.div`
@@ -57,12 +60,12 @@ export const ExchangeRateDisplay = styled.div`
   color: ${p => p.theme.palette.grey600};
   text-align: right;
   margin-top: -2px;
+`
 
-  svg {
-    height: 18px;
-    width: 18px;
-    vertical-align: text-bottom;
-  }
+export const BatIcon = styled(BatColorIcon)`
+  height: 18px;
+  width: 18px;
+  vertical-align: text-bottom;
 `
 
 export const AmountOptionList = styled.div`
@@ -70,26 +73,23 @@ export const AmountOptionList = styled.div`
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-
-  > div {
-    margin: 0 10px 12px;
-    text-align: center;
-  }
-
-  button.selected-amount {
-    background: ${p => p.theme.color.brandBat};
-    color: ${p => p.theme.palette.white};
-  }
 `
 
-export const AmountOptionContainer = styled.div<{ selected?: boolean }>`
-  button {
-    min-width: 98px;
-    background: ${p => p.selected ? p.theme.color.brandBat : 'transparent'};
-    border-color: ${p => p.theme.color.brandBat};
-    margin-bottom: 7px;
-    color: ${p => p.selected ? p.theme.palette.white : p.theme.color.brandBat};
-  }
+export const AmountOptionContainer = styled.div`
+  margin: 0 10px 12px;
+  text-align: center;
+`
+
+interface AmountOptionButtonProps extends ButtonProps {
+  selected?: boolean
+}
+
+export const AmountOptionButton = styled(Button as ComponentType<AmountOptionButtonProps>)`
+  min-width: 98px;
+  background: ${p => p.selected ? p.theme.color.brandBat : 'transparent'};
+  border-color: ${p => p.theme.color.brandBat};
+  margin-bottom: 7px;
+  color: ${p => p.selected ? p.theme.palette.white : p.theme.color.brandBat};
 `
 
 export const AmountOptionExchange = styled.div`

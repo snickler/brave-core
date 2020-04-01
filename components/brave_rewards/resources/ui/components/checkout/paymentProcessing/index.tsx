@@ -3,16 +3,15 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react'
-import { LoaderIcon } from 'brave-ui/components/icons'
 
 import { LocaleContext } from '../localeContext'
-import { Container } from './style'
+import { Container, LoadIcon } from './style'
 
 export function PaymentProcessing (props: {}) {
   const locale = React.useContext(LocaleContext)
   return (
     <Container>
-      <LoaderIcon />
+      <LoadIcon />
       <div>
         {locale.get('paymentProcessing')}
       </div>

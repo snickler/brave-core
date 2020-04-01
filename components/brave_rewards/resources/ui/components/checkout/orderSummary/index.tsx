@@ -10,6 +10,7 @@ import {
   Container,
   Description,
   BatAmount,
+  BatSymbol,
   ExchangeAmount
 } from './style'
 
@@ -36,7 +37,10 @@ export function OrderSummary (props: OrderSummaryProps) {
               <Description>{props.description}</Description>
             </td>
             <td>
-              <BatAmount locale={locale}>{props.orderTotal}</BatAmount>
+              <BatAmount>
+                {props.orderTotal}
+                <BatSymbol>{locale.get('bat')}</BatSymbol>
+              </BatAmount>
               <ExchangeAmount>{props.orderTotalConverted}</ExchangeAmount>
             </td>
           </tr>

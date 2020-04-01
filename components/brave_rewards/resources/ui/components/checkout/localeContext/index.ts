@@ -10,6 +10,6 @@ export interface LocaleData {
 
 export const LocaleContext = React.createContext<LocaleData>({
   get (key: string) {
-    return '?'
+    return 'MISSING'
   }
 })

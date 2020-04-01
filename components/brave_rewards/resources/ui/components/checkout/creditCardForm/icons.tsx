@@ -2,10 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { CreditCardIcon } from 'brave-ui/components/icons'
+import { DefaultCardIcon } from './style'
 
 export function getCreditCardIcon (type: string) {
   switch (type) {
-    default: return CreditCardIcon
+    default: return DefaultCardIcon
   }
 }

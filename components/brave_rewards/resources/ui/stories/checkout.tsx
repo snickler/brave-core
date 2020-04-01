@@ -28,7 +28,8 @@ const localeData = {
     addFundsSubtitle: 'Add BAT to your wallet using your credit card',
     currentBalance: 'Current Balance',
     batNeeded: 'BAT needed',
-    selectAmountToAdd: 'Select amount to add',
+    selectAmountToAddStep: '1. Select amount to add',
+    enterCreditCardStep: '2. Enter credit card info',
     transactionFee: 'Transaction Fee',
     orderTotal: 'Order Total',
     enterCreditCardInfo: 'Enter credit card info',
@@ -61,7 +62,7 @@ const localeData = {
     updated: 'Updated'
   },
   get (key: string) {
-    return this.strings[key] || '\u2753'
+    return this.strings[key] || 'MISSING'
   }
 }
 

@@ -3,8 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react'
-import { Button } from 'brave-ui/components'
-import { CaratStrongRightIcon } from 'brave-ui/components/icons'
 
 import { LocaleContext } from '../localeContext'
 import { FormSection } from '../formSection'
@@ -16,7 +14,9 @@ import {
   ContinueBoxLink,
   ContinueBoxText,
   ConfirmButtonRow,
-  TermsOfSale
+  ConfirmButton,
+  TermsOfSale,
+  RightIcon
 } from './style'
 
 interface UseCreditCardPanelProps {
@@ -30,9 +30,6 @@ interface UseCreditCardPanelProps {
 
 export function UseCreditCardPanel (props: UseCreditCardPanelProps) {
   const locale = React.useContext(LocaleContext)
-  const onBack = () => { props.setContinueWithCard(false) }
-  const onContinue = () => { props.setContinueWithCard(true) }
-
   const creditCardFormRef = React.useRef<CreditCardFormHandle>(null)
 
   const onConfirmClick = () => {
@@ -45,6 +42,10 @@ export function UseCreditCardPanel (props: UseCreditCardPanelProps) {
         errors[0].element.focus()
       }
     }
+  }
+
+  const onBack = () => {
+    props.setContinueWithCard(false)
   }
 
   const title = props.rewardsEnabled && !props.continueWithCard
@@ -69,9 +70,10 @@ export function UseCreditCardPanel (props: UseCreditCardPanelProps) {
           <CreditCardForm handleRef={creditCardFormRef} />
         </FormSection>
         <ConfirmButtonRow showBackLink={props.continueWithCard}>
-          {props.continueWithCard && <div><GoBackLink onClick={onBack} /></div>}
+          {props.continueWithCard && <GoBackLink onClick={onBack} />}
           <div>
-            <Button
+            <ConfirmButton
+              showBackLink={props.continueWithCard}
               text={locale.get('confirmButtonText')}
               size='medium'
               onClick={onConfirmClick}
@@ -87,6 +89,11 @@ export function UseCreditCardPanel (props: UseCreditCardPanelProps) {
     )
   }
 
+  const onContinueClick = (event: React.MouseEvent) => {
+    event.preventDefault()
+    props.setContinueWithCard(true)
+  }
+
   return (
     <FormSection title={title}>
       <ContinueBox>
@@ -94,9 +101,9 @@ export function UseCreditCardPanel (props: UseCreditCardPanelProps) {
           {locale.get('continueWithCreditCardMessage')}
         </ContinueBoxText>
         <ContinueBoxLink>
-          <a href='javascript:void 0' onClick={onContinue}>
+          <a href='#' onClick={onContinueClick}>
             {locale.get('continueWithCreditCard')}
-            <CaratStrongRightIcon />
+            <RightIcon />
           </a>
         </ContinueBoxLink>
       </ContinueBox>

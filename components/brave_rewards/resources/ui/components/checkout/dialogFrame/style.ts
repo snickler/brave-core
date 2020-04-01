@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import styled, { css } from 'styled-components'
+import { BatColorIcon } from 'brave-ui/components/icons'
 
 import backgroundSrc from './assets/dialog_bg.svg'
 
@@ -31,7 +32,7 @@ export const MainPanel = styled.div<{ showBackground?: boolean }>`
 
 export const TopBar = styled.div`
   padding: 15px 22px 15px 35px;
-  position: absolute;
+  position: relative;
   top: 0;
   left: 0;
   right: 0;
@@ -42,14 +43,12 @@ export const TopBar = styled.div`
   text-transform: uppercase;
 `
 
-export const DialogTitle = styled.span`
-  svg {
-    position: absolute;
-    top: 13px;
-    left: 15px;
-    height: 17px;
-    width: auto;
-  }
+export const DialogTitleIcon = styled(BatColorIcon)`
+  position: absolute;
+  top: 13px;
+  left: 15px;
+  height: 17px;
+  width: auto;
 `
 
 export const BatText = styled.span`
@@ -70,7 +69,7 @@ export const CloseButton = styled.button`
 `
 
 export const Content = styled.div`
-  padding: 51px 49px 34px;
+  padding: 8px 49px 34px;
 
   h1 {
     margin: 0 0 18px 0;

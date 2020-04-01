@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import styled from 'styled-components'
+import { CreditCardIcon } from 'brave-ui/components/icons'
 
 export const Container = styled.div`
   max-width: 270px;
@@ -35,16 +36,16 @@ export const InputIconContainer = styled.div`
   top: 0;
   left: 0;
   height: 0;
+`
 
-  svg {
-    position: absolute;
-    top: -28px;
-    left: 7px;
-    width: 22px;
-    height: 22px;
-    color: ${p => p.theme.palette.grey400};
-    opacity: .668;
-  }
+export const DefaultCardIcon = styled(CreditCardIcon)`
+  position: absolute;
+  top: -28px;
+  left: 7px;
+  width: 22px;
+  height: 22px;
+  color: ${p => p.theme.palette.grey400};
+  opacity: .668;
 `
 
 export const CardNumber = styled.div`
@@ -68,10 +69,10 @@ export const SecurityCode = styled.div`
 export const SaveThisCard = styled.div`
   grid-column: 1 / 3;
   margin-top: -6px;
+`
 
-  > label {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+export const SaveThisCardLabel = styled.label`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `

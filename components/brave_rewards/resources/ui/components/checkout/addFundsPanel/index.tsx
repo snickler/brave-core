@@ -3,8 +3,6 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react'
-import { Button } from 'brave-ui/components'
-import { BatColorIcon } from 'brave-ui/components/icons'
 
 import { LocaleContext } from '../localeContext'
 import { FormSection } from '../formSection'
@@ -18,13 +16,16 @@ import {
   CurrentBalanceBat,
   CurrentBalanceConverted,
   ExchangeRateDisplay,
+  BatIcon,
   AmountOptionList,
   AmountOptionContainer,
+  AmountOptionButton,
   AmountOptionExchange,
   ChargeSummary,
   ChargeSummaryTotal,
   ChargeSummaryTotalAmount,
   PurchaseButtonRow,
+  AddFundsButton,
   TermsOfSale
 } from './style'
 
@@ -64,11 +65,12 @@ function AmountOptionPanel (props: AmountOpionPanelProps) {
           props.amountOptions.map(option => {
             const selectAmount = () => { props.setSelectedAmount(option.amount) }
             return (
-              <AmountOptionContainer key={option.amount} selected={option === selectedOption}>
-                <Button
+              <AmountOptionContainer key={option.amount}>
+                <AmountOptionButton
                   text={`${option.amount} ${locale.get('bat')}`}
                   size={'medium'}
                   onClick={selectAmount}
+                  selected={option === selectedOption}
                 />
                 <AmountOptionExchange>
                   {option.amountConverted}
@@ -135,12 +137,10 @@ export function AddFundsPanel (props: AddFundsPanelProps) {
       <FormSection
         title={
           <>
-            <div>1. ${locale.get('selectAmountToAdd')}</div>
-            <div>
-              <ExchangeRateDisplay>
-                <BatColorIcon /> 1 {locale.get('bat')} = {props.unitValueConverted}
-              </ExchangeRateDisplay>
-            </div>
+            <span>{locale.get('selectAmountToAddStep')}</span>
+            <ExchangeRateDisplay>
+              <BatIcon /> 1 {locale.get('bat')} = {props.unitValueConverted}
+            </ExchangeRateDisplay>
           </>
         }
       >
@@ -150,22 +150,18 @@ export function AddFundsPanel (props: AddFundsPanelProps) {
           setSelectedAmount={setSelectedAmount}
         />
       </FormSection>
-      <FormSection title={`2. ${locale.get('enterCreditCardInfo')}`}>
+      <FormSection title={locale.get('enterCreditCardStep')}>
         <CreditCardForm handleRef={creditCardFormRef} />
       </FormSection>
       <PurchaseButtonRow>
-        <div>
-          <GoBackLink onClick={props.onCancel} />
-        </div>
-        <div>
-          <Button
-            text={locale.get('addFundsButtonText')}
-            size='medium'
-            onClick={onPurchaseClick}
-            type='accent'
-            brand='rewards'
-          />
-        </div>
+        <GoBackLink onClick={props.onCancel} />
+        <AddFundsButton
+          text={locale.get('addFundsButtonText')}
+          size='medium'
+          onClick={onPurchaseClick}
+          type='accent'
+          brand='rewards'
+        />
       </PurchaseButtonRow>
       <TermsOfSale>
         <span dangerouslySetInnerHTML={{ __html: locale.get('addFundsTermsOfSale') }} />
