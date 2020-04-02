@@ -13,9 +13,10 @@ import { CreditCardDetails } from '../creditCardForm'
 interface PaymentMethodPanelProps {
   rewardsEnabled?: boolean
   orderDescription: string
-  orderTotal: number
+  orderTotal: string
   orderTotalConverted: string
-  walletBalance: number
+  hasSufficientFunds: boolean
+  walletBalance: string
   walletBalanceConverted: string
   walletVerified?: boolean
   walletLastUpdated: string
@@ -27,23 +28,22 @@ interface PaymentMethodPanelProps {
 export function PaymentMethodPanel (props: PaymentMethodPanelProps) {
   const locale = React.useContext(LocaleContext)
   const [continueWithCard, setContinueWithCard] = React.useState<boolean>(false)
-  const hasSufficientFunds = props.walletBalance >= props.orderTotal
 
   return (
     <>
       <h1>{locale.get('paymentMethodTitle')}</h1>
       <OrderSummary
         description={props.orderDescription}
-        orderTotal={props.orderTotal.toFixed(1)}
+        orderTotal={props.orderTotal}
         orderTotalConverted={props.orderTotalConverted}
       />
       {
         continueWithCard ? null :
           <UseWalletPanel
-            balance={props.walletBalance.toFixed(1)}
+            balance={props.walletBalance}
             balanceConverted={props.walletBalanceConverted}
             lastUpdated={props.walletLastUpdated}
-            hasSufficientFunds={hasSufficientFunds}
+            hasSufficientFunds={props.hasSufficientFunds}
             rewardsEnabled={props.rewardsEnabled}
             walletVerified={props.walletVerified}
             onShowAddFunds={props.onShowAddFunds}
@@ -51,7 +51,7 @@ export function PaymentMethodPanel (props: PaymentMethodPanelProps) {
           />
       }
       <UseCreditCardPanel
-        hasSufficientFunds={hasSufficientFunds}
+        hasSufficientFunds={props.hasSufficientFunds}
         rewardsEnabled={props.rewardsEnabled}
         walletVerified={props.walletVerified}
         continueWithCard={continueWithCard}

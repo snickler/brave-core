@@ -79,12 +79,13 @@ storiesOf('Rewards/Checkout', module)
           <PaymentMethodPanel
             rewardsEnabled={knobs.boolean('rewardsEnabled', true)}
             orderDescription={knobs.text('orderDescription', defaultDescription)}
-            orderTotal={knobs.number('orderTotal', 45)}
+            orderTotal={knobs.text('orderTotal', '45.0')}
             orderTotalConverted={knobs.text('orderTotalConverted', '$9.00')}
-            walletBalance={knobs.number('walletBalance', 100)}
+            walletBalance={knobs.text('walletBalance', '100.0')}
             walletBalanceConverted={knobs.text('walletBalanceConverted', '$20.00')}
             walletLastUpdated={knobs.text('walletLastUpdated', 'Today at 11:38 am')}
             walletVerified={knobs.boolean('walletVerified', true)}
+            hasSufficientFunds={knobs.boolean('hasSufficientFunds', true)}
             onPayWithCreditCard={actionLogger('onPaymentWithCreditCard')}
             onPayWithWallet={actionLogger('onPaymentWithWallet')}
             onShowAddFunds={actionLogger('onShowAddFunds')}
