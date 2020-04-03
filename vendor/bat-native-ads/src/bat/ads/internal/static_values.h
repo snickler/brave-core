@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string>
 #include <map>
+#include <vector>
 
 #include "base/time/time.h"
 
@@ -61,100 +62,103 @@ const uint16_t kPurchaseIntentMaxSegments = 3;
 const int kDoNotDisturbFromHour = 21;  // 9pm
 const int kDoNotDisturbToHour = 6;     // 6am
 
-const std::map<int, std::map<std::string, bool>> kSupportedRegionsSchemas = {
+const std::map<int, std::vector<std::string>> kSupportedRegionsSchemas = {
   // Append newly supported regions with a new schema version and update
   // |kSupportedRegionsSchemaVersionNumber| to match the new version
   //
-  //   Format: { schema_version : {{region, targeted}} }
-  //
-  // If |targeted| is set to |true| web pages are classified using the
-  // "bat-native-usermodel", otherwise untargeted ads are delivered
+  //   Format: { schema_version : { region... } }
   {
     1, {
-      { "US", true  },  // United States of America
-      { "CA", true  },  // Canada
-      { "GB", true  },  // United Kingdom (Great Britain and Northern Ireland)
-      { "DE", true  },  // Germany
-      { "FR", true  }   // France
+      "US",   // United States of America
+      "CA",   // Canada
+      "GB",   // United Kingdom (Great Britain and Northern Ireland)
+      "DE",   // Germany
+      "FR"    // France
     }
   },
   {
     2, {
-      { "AU", true  },  // Australia
-      { "NZ", true  },  // New Zealand
-      { "IE", true  }   // Ireland
+      "AU",   // Australia
+      "NZ",   // New Zealand
+      "IE"    // Ireland
     }
   },
   {
     3, {
-      { "AR", false },  // Argentina
-      { "AT", false },  // Austria
-      { "BR", false },  // Brazil
-      { "CH", false },  // Switzerland
-      { "CL", false },  // Chile
-      { "CO", false },  // Colombia
-      { "DK", false },  // Denmark
-      { "EC", false },  // Ecuador
-      { "IL", false },  // Israel
-      { "IN", false },  // India
-      { "IT", false },  // Italy
-      { "JP", false },  // Japan
-      { "KR", false },  // Korea
-      { "MX", false },  // Mexico
-      { "NL", false },  // Netherlands
-      { "PE", false },  // Peru
-      { "PH", false },  // Philippines
-      { "PL", false },  // Poland
-      { "SE", false },  // Sweden
-      { "SG", false },  // Singapore
-      { "VE", false },  // Venezuela
-      { "ZA", false }   // South Africa
+      "AR",   // Argentina
+      "AT",   // Austria
+      "BR",   // Brazil
+      "CH",   // Switzerland
+      "CL",   // Chile
+      "CO",   // Colombia
+      "DK",   // Denmark
+      "EC",   // Ecuador
+      "IL",   // Israel
+      "IN",   // India
+      "IT",   // Italy
+      "JP",   // Japan
+      "KR",   // Korea
+      "MX",   // Mexico
+      "NL",   // Netherlands
+      "PE",   // Peru
+      "PH",   // Philippines
+      "PL",   // Poland
+      "SE",   // Sweden
+      "SG",   // Singapore
+      "VE",   // Venezuela
+      "ZA"    // South Africa
     }
   },
   {
     4, {
-      { "KY", true  }   // Cayman Islands
+      "KY"    // Cayman Islands
     }
   },
   {
     5, {
-      { "AE", false },  // United Arab Emirates
-      { "AL", false },  // Albania
-      { "AZ", false },  // Azerbaijan
-      { "BD", false },  // Bangladesh
-      { "BE", false },  // Belgium
-      { "BG", false },  // Bulgaria
-      { "CN", false },  // China
-      { "CZ", false },  // Czechia
-      { "DZ", false },  // Algeria
-      { "EG", false },  // Egypt
-      { "ES", false },  // Spain
-      { "FI", false },  // Finland
-      { "GR", false },  // Greece
-      { "HK", false },  // Hong Kong
-      { "HR", false },  // Croatia
-      { "HU", false },  // Hungary
-      { "ID", false },  // Indonesia
-      { "IQ", false },  // Iraq
-      { "KH", false },  // Cambodia
-      { "LT", false },  // Lithuania
-      { "MA", false },  // Morocco
-      { "MY", false },  // Malaysia
-      { "NG", false },  // Nigeria
-      { "NO", false },  // Norway
-      { "PK", false },  // Pakistan
-      { "PT", false },  // Portugal
-      { "RO", false },  // Romania
-      { "RS", false },  // Serbia
-      { "RU", false },  // Russian Federation
-      { "SA", false },  // Saudi Arabia
-      { "SI", false },  // Slovenia
-      { "SK", false },  // Slovakia
-      { "TH", false },  // Thailand
-      { "TR", false },  // Turkey
-      { "TW", false },  // Taiwan
-      { "UA", false },  // Ukraine
-      { "VN", false }   // Vietnam
+      "AE",   // United Arab Emirates
+      "AL",   // Albania
+      "AZ",   // Azerbaijan
+      "BD",   // Bangladesh
+      "BE",   // Belgium
+      "BG",   // Bulgaria
+      "CN",   // China
+      "CZ",   // Czechia
+      "DZ",   // Algeria
+      "EG",   // Egypt
+      "ES",   // Spain
+      "FI",   // Finland
+      "GR",   // Greece
+      "HK",   // Hong Kong
+      "HR",   // Croatia
+      "HU",   // Hungary
+      "ID",   // Indonesia
+      "IQ",   // Iraq
+      "KH",   // Cambodia
+      "LT",   // Lithuania
+      "MA",   // Morocco
+      "MY",   // Malaysia
+      "NG",   // Nigeria
+      "NO",   // Norway
+      "PK",   // Pakistan
+      "PT",   // Portugal
+      "RO",   // Romania
+      "RS",   // Serbia
+      "RU",   // Russia
+      "SA",   // Saudi Arabia
+      "SI",   // Slovenia
+      "SK",   // Slovakia
+      "TH",   // Thailand
+      "TR",   // Turkey
+      "TW",   // Taiwan
+      "UA",   // Ukraine
+      "VN"    // Vietnam
+    }
+  },
+  {
+    6, {
+      "101",  // World
+      "150"   // Europe
     }
   }
 
