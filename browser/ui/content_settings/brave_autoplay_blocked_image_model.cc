@@ -9,7 +9,7 @@
 
 #include "brave/browser/ui/content_settings/brave_autoplay_content_setting_bubble_model.h"
 #include "brave/grit/brave_generated_resources.h"
-#include "brave/app/vector_icons/vector_icons.h"
+#include "brave/components/vector_icons/vector_icons.h"
 #include "chrome/app/vector_icons/vector_icons.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "content/public/browser/web_contents.h"
