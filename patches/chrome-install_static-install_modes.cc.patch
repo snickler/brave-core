@@ -1,12 +1,12 @@
 diff --git a/chrome/install_static/install_modes.cc b/chrome/install_static/install_modes.cc
-index 42d9966254758305e0dc999b186aa7abe1ff762a..7b53849803ff00ac824e1d6c7fb378ffcc63ba10 100644
+index 8454b2ab6871c950ed976aafdbec8cfacb506e95..0a711b39e9b713e4421140fdd192a5d757dee98c 100644
 --- a/chrome/install_static/install_modes.cc
 +++ b/chrome/install_static/install_modes.cc
-@@ -12,6 +12,21 @@ std::wstring GetUnregisteredKeyPathForProduct(const wchar_t* product) {
-   return std::wstring(L"Software\\").append(product);
+@@ -24,6 +24,20 @@ std::wstring GetClientStateMediumKeyPathForApp(const wchar_t* app_guid) {
+   return std::wstring(L"Software\\Google\\Update\\ClientStateMedium\\")
+       .append(app_guid);
  }
- 
-+#if defined(BRAVE_CHROMIUM_BUILD)
++#elif defined(BRAVE_CHROMIUM_BUILD)
 +std::wstring GetClientsKeyPathForApp(const wchar_t* app_guid) {
 +  return std::wstring(L"Software\\BraveSoftware\\Update\\Clients\\").append(app_guid);
 +}
@@ -20,15 +20,6 @@ index 42d9966254758305e0dc999b186aa7abe1ff762a..7b53849803ff00ac824e1d6c7fb378ff
 +  return std::wstring(L"Software\\BraveSoftware\\Update\\ClientStateMedium\\")
 +      .append(app_guid);
 +}
-+#else
- std::wstring GetClientsKeyPathForApp(const wchar_t* app_guid) {
-   return std::wstring(L"Software\\Google\\Update\\Clients\\").append(app_guid);
- }
-@@ -25,6 +40,7 @@ std::wstring GetClientStateMediumKeyPathForApp(const wchar_t* app_guid) {
-   return std::wstring(L"Software\\Google\\Update\\ClientStateMedium\\")
-       .append(app_guid);
- }
-+#endif
- 
- }  // namespace
- 
+ #else
+ std::wstring GetUnregisteredKeyPathForProduct(const wchar_t* product) {
+   return std::wstring(L"Software\\").append(product);
