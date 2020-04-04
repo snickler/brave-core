@@ -480,9 +480,6 @@ void AdsImpl::OnTabUpdated(
     previous_tab_url_ = active_tab_url_;
     active_tab_url_ = url;
 
-    TestShoppingData(url);
-    TestSearchState(url);
-
     const Reports reports(this);
     FocusInfo focus_info;
     focus_info.tab_id = tab_id;
@@ -700,12 +697,10 @@ void AdsImpl::OnPageLoaded(
     return;
   }
 
-  if (TestSearchState(url)) {
+  if (SearchProviders::IsSearchEngine(url)) {
     BLOG(INFO) << "Site visited " << url << ", URL is a search engine";
     return;
   }
-
-  TestShoppingData(url);
 
   MaybeClassifyPage(url, content);
 
@@ -721,7 +716,7 @@ void AdsImpl::ExtractPurchaseIntentSignal(
     return;
   }
 
-  if (!TestSearchState(url) &&
+  if (!SearchProviders::IsSearchEngine(url) &&
       helper::Uri::MatchesDomainOrHost(url, previous_tab_url_)) {
     return;
   }
@@ -917,37 +912,6 @@ AdsImpl::GetWinningPurchaseIntentCategories() {
       purchase_intent_signal_history, kPurchaseIntentMaxSegments);
 
   return winning_categories;
-}
-
-void AdsImpl::TestShoppingData(
-    const std::string& url) {
-  if (!IsInitialized()) {
-    BLOG(WARNING) << "TestShoppingData failed as not initialized";
-    return;
-  }
-
-  if (helper::Uri::MatchesDomainOrHost(url, kShoppingStateUrl)) {
-    client_->FlagShoppingState(url, 1.0);
-  } else {
-    client_->UnflagShoppingState();
-  }
-}
-
-bool AdsImpl::TestSearchState(
-    const std::string& url) {
-  if (!IsInitialized()) {
-    BLOG(WARNING) << "TestSearchState failed as not initialized";
-    return false;
-  }
-
-  auto is_search_engine = SearchProviders::IsSearchEngine(url);
-  if (is_search_engine) {
-    client_->FlagSearchState(url, 1.0);
-  } else {
-    client_->UnflagSearchState(url);
-  }
-
-  return is_search_engine;
 }
 
 void AdsImpl::ServeSampleAd() {
